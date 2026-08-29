@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五味の知恵：現代科学と東洋医学の統合ガイド</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --color-bg: #fdfaf5;
+            --color-accent: #8d7d66;
+            --color-modern: #4a6fa5;
+            --color-tcm: #8b5e34;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--color-bg);
+            color: #333;
+            scroll-behavior: smooth;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .symptom-card.active {
+            border-color: #8d7d66;
+            background-color: #f5f0e8;
+            box-shadow: 0 4px 12px rgba(141, 125, 102, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .season-btn.active {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .pulse-subtle {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <span class="font-bold text-lg tracking-wider text-stone-700 flex items-center gap-2">
+                <span class="text-amber-700">☯</span> 五味の知恵
+            </span>
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="text-sm text-stone-600 hover:text-stone-900 transition">概念</a>
+                <a href="#comparison" class="text-sm text-stone-600 hover:text-stone-900 transition">比較</a>
+                <a href="#seasonal" class="text-sm text-stone-600 hover:text-stone-900 transition">季節の養生</a>
+                <a href="#checker" class="text-sm text-stone-600 hover:text-stone-900 transition">セルフチェック</a>
+                <a href="#tips" class="text-sm text-stone-600 hover:text-stone-900 transition">1人暮らし生活術</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-14 md:py-20 px-4 text-center bg-gradient-to-b from-amber-50/50 to-transparent">
+        <div class="max-w-3xl mx-auto">
+            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full mb-4">現代科学 × 東洋医学</span>
+            <h1 class="text-3xl md:text-5xl font-bold text-stone-800 mb-6 leading-tight">味覚を整え、身体を調える。</h1>
+            <p class="text-stone-600 leading-relaxed text-sm md:text-base">
+                私たちの心身を支える「五味」。それは生理学的な栄養のシグナルであり、東洋医学では身体のバランスを司るエネルギーでもあります。
+                毎日の体調や季節に合わせて必要な味を取り入れ、一人暮らしでも食品ロスなく体を整えましょう。
+            </p>
+        </div>
+    </header>
+
+    <section id="about" class="py-10 bg-white px-4 border-y border-stone-100">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-stone-50 p-6 md:p-8 rounded-2xl border border-stone-200">
+                <h2 class="text-xl font-bold mb-3 text-stone-800 flex items-center gap-2">
+                    <span>💡</span> 「五味（ごみ）」のふたつの視点
+                </h2>
+                <p class="text-stone-600 text-sm md:text-base leading-relaxed">
+                    「五味」という言葉は、現代科学における舌で感知する**「基本五味（甘・塩・酸・苦・旨）」**と、東洋医学（薬膳）で体内のエネルギー循環や内臓の働きに作用する**「五行の五味（酸・苦・甘・辛・鹹）」**の2つの文脈を持ちます。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="comparison" class="py-16 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-stone-800 mb-2">二つの「五味」を比較する</h2>
+            <p class="text-sm text-stone-500">切り替えてそれぞれのシステムの特徴を確認できます</p>
+        </div>
+
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex bg-stone-200/80 p-1 rounded-full shadow-inner">
+                <button id="btn-modern" class="px-5 py-2 rounded-full transition text-xs md:text-sm font-medium bg-white shadow-sm text-stone-800" onclick="switchView('modern')">現代の生理学（基本五味）</button>
+                <button id="btn-tcm" class="px-5 py-2 rounded-full transition text-xs md:text-sm font-medium text-stone-600" onclick="switchView('tcm')">東洋医学・薬膳（五行の五味）</button>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div class="chart-container order-2 md:order-1 bg-white p-4 rounded-2xl shadow-sm border border-stone-100">
+                <canvas id="tasteChart"></canvas>
+            </div>
+            <div id="content-display" class="order-1 md:order-2 space-y-4">
+                <!-- Dynamic Content via JS -->
+            </div>
+        </div>
+    </section>
+
+    <section id="seasonal" class="py-16 bg-stone-50 px-4 border-t border-stone-200">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-stone-800 mb-2">季節の五味養生</h2>
+                <p class="text-sm text-stone-600">四季や土用の気候変化によって、人間の身体で不足しやすくなるエネルギー（味）が変わります。</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
+                <button data-season="spring" onclick="switchSeason('spring', this)" class="season-btn px-4 py-2 rounded-full border border-stone-300 text-xs md:text-sm font-medium transition active">🌸 春</button>
+                <button data-season="summer" onclick="switchSeason('summer', this)" class="season-btn px-4 py-2 rounded-full border border-stone-300 text-xs md:text-sm font-medium transition">☀️ 夏</button>
+                <button data-season="doyo" onclick="switchSeason('doyo', this)" class="season-btn px-4 py-2 rounded-full border border-stone-300 text-xs md:text-sm font-medium transition">🍂 土用（季節の境目）</button>
+                <button data-season="autumn" onclick="switchSeason('autumn', this)" class="season-btn px-4 py-2 rounded-full border border-stone-300 text-xs md:text-sm font-medium transition">🍁 秋</button>
+                <button data-season="winter" onclick="switchSeason('winter', this)" class="season-btn px-4 py-2 rounded-full border border-stone-300 text-xs md:text-sm font-medium transition">❄️ 冬</button>
+            </div>
+
+            <div id="season-content" class="grid md:grid-cols-2 gap-6 items-center bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-stone-200 fade-in">
+                <!-- Dynamic Seasonal Content via JS -->
+            </div>
+        </div>
+    </section>
+
+    <section id="checker" class="py-16 bg-stone-100 px-4 border-t border-stone-200">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-8">
+                <span class="text-xs font-semibold text-amber-800 tracking-wider uppercase bg-amber-100 px-3 py-1 rounded-full">リアルタイム連動</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-stone-800 mt-2 mb-2">体調セルフチェック</h2>
+                <p class="text-sm text-stone-600">今気になる症状を選んでください（複数選択可）。下の**「1人暮らし生活術」**も連動して自動更新されます。</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+                <button onclick="toggleSymptom('fatigue', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">😫</span>
+                    <span class="text-xs font-bold text-stone-700">強い疲労感</span>
+                </button>
+                <button onclick="toggleSymptom('cold', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">🥶</span>
+                    <span class="text-xs font-bold text-stone-700">手足の冷え</span>
+                </button>
+                <button onclick="toggleSymptom('stress', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">😤</span>
+                    <span class="text-xs font-bold text-stone-700">イライラ・緊張</span>
+                </button>
+                <button onclick="toggleSymptom('digest', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">🥣</span>
+                    <span class="text-xs font-bold text-stone-700">胃腸の疲労</span>
+                </button>
+                <button onclick="toggleSymptom('edema', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">💧</span>
+                    <span class="text-xs font-bold text-stone-700">むくみ・重だるさ</span>
+                </button>
+                <button onclick="toggleSymptom('constip', this)" class="symptom-card p-4 bg-white border-2 border-stone-200 rounded-xl text-center transition hover:border-stone-400">
+                    <span class="block text-2xl mb-1">💩</span>
+                    <span class="text-xs font-bold text-stone-700">便秘・通じの滞り</span>
+                </button>
+            </div>
+
+            <div id="recommendation-box" class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-amber-200/60 hidden fade-in mb-6">
+                <div class="flex justify-between items-center mb-4 border-b border-stone-100 pb-3">
+                    <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
+                        <span>✨</span> あなたに必要な五味のアドバイス
+                    </h3>
+                    <a href="#tips" class="text-xs text-amber-800 font-semibold hover:underline flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
+                        生活術・レシピを見る ↓
+                    </a>
+                </div>
+                <div id="recommendation-content" class="grid md:grid-cols-2 gap-4">
+                    <!-- Dynamic Result -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tips" class="py-16 bg-stone-900 text-stone-200 px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-8">
+                <span class="text-xs font-bold text-amber-400 tracking-widest uppercase">1人暮らし向け・食品ロス削減</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mt-1 mb-2">1人暮らしの「無駄ゼロ」五味生活</h2>
+                <p class="text-sm text-stone-400 max-w-xl mx-auto">
+                    選択した「体調セルフチェック」の症状に応じて、今すぐストック・活用すべき無駄のない食材テクニックが自動更新されます。
+                </p>
+                
+                <!-- Dynamic Dynamic Status Badge -->
+                <div id="tips-status-badge" class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-stone-800 border border-stone-700 rounded-full text-xs font-medium text-amber-300 shadow-inner">
+                    <!-- Dynamic text via JS -->
+                </div>
+            </div>
+
+            <div id="tips-cards" class="grid md:grid-cols-3 gap-6 mb-8">
+                <!-- Dynamic Tips Cards via JS -->
+            </div>
+
+            <!-- Dynamic Customized Recipe Card -->
+            <div id="recipe-card" class="bg-gradient-to-br from-stone-800 to-stone-850 border border-amber-900/40 p-6 md:p-8 rounded-3xl shadow-xl fade-in">
+                <!-- Dynamic Recipe via JS -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-10 bg-white border-t border-stone-200 text-center text-stone-500 text-xs">
+        <p>&copy; 2026 五味の知恵：現代科学と東洋医学の統合ガイド</p>
+    </footer>
+
+    <script>
+        const data = {
+            modern: {
+                labels: ['甘味', '塩味', '酸味', '苦味', '旨味'],
+                values: [8, 8, 8, 8, 8],
+                title: '現代生理学：基本五味',
+                desc: '舌の味蕾で知覚する5つの生理的シグナル。生物が生命維持のために進化させた味覚感知システムです。',
+                items: [
+                    { name: '甘味', role: '主要エネルギー源（糖質・炭水化物）の感知', color: 'bg-yellow-50 text-yellow-900 border-yellow-200' },
+                    { name: '塩味', role: '体液の浸透圧やミネラルバランスの保持', color: 'bg-blue-50 text-blue-900 border-blue-200' },
+                    { name: '酸味', role: '腐敗・未熟の警告 ＆ クエン酸による代謝促進', color: 'bg-red-50 text-red-900 border-red-200' },
+                    { name: '苦味', role: '有毒物質やアルカロイドへの本能的警戒シグナル', color: 'bg-green-50 text-green-900 border-green-200' },
+                    { name: '旨味', role: '身体を構成するタンパク質（アミノ酸）の存在', color: 'bg-amber-50 text-amber-900 border-amber-200' }
+                ]
+            },
+            tcm: {
+                labels: ['酸', '苦', '甘', '辛', '鹹'],
+                values: [8, 8, 8, 8, 8],
+                title: '東洋医学：五行の五味',
+                desc: '自然界の法則（五行）に基づき、食材が身体のどの臓器（肝・心・脾・肺・腎）に働きかけるかで分類します。',
+                items: [
+                    { name: '酸（肝）', role: '収斂作用（汗や気を引き締め漏らさない）', color: 'bg-emerald-50 text-emerald-900 border-emerald-200' },
+                    { name: '苦（心）', role: '清熱・燥湿作用（熱を下げ湿気を乾かす）', color: 'bg-rose-50 text-rose-900 border-rose-200' },
+                    { name: '甘（脾）', role: '補益・緩急作用（消化器を補い緊張を緩和）', color: 'bg-amber-50 text-amber-900 border-amber-200' },
+                    { name: '辛（肺）', role: '発散・行気作用（血行促進・温め・発汗）', color: 'bg-orange-50 text-orange-900 border-orange-200' },
+                    { name: '鹹（腎）', role: '軟堅・潤下作用（固いものを和らげ通じを整える）', color: 'bg-indigo-50 text-indigo-900 border-indigo-200' }
+                ]
+            }
+        };
+
+        const seasons = {
+            spring: {
+                name: '春（3月〜5月）',
+                problem: '「気」が上昇しやすく、イライラや目まい、自律神経の乱れが生じやすい。肝（かん）が過剰に働きがち。',
+                lack: '汗や気が漏れるのを防ぐ「酸」と、消化器を助ける「甘」が不足しやすくなります。',
+                remedy: '酸味で上がりすぎた気を引き締め、穏やかな甘みで胃腸の働きをサポートします。',
+                foods: '梅干し、いちご、キャベツ、ふき、柑橘類',
+                color: 'text-emerald-700'
+            },
+            summer: {
+                name: '夏（6月〜8月）',
+                problem: '暑さで体内に「熱」がこもり、大量の発汗で水分やミネラル、気（活力）が削られます。',
+                lack: '体熱を下げる「苦」と、水分の過度な流出を止める「酸」が決定的に不足します。',
+                remedy: '苦味で体内の余分な熱を逃がし、酸味で潤いをキープします。',
+                foods: 'ゴーヤ、トマト、レモン、緑茶、きゅうり',
+                color: 'text-rose-600'
+            },
+            doyo: {
+                name: '土用（季節の変わり目）',
+                problem: '湿気が多くなり、消化器（脾）がダメージを受け、身体の重だるさや食欲不振が起こります。',
+                lack: '湿気を飛ばす「苦」と、胃腸を労わる優しい「甘」の調和が不足。',
+                remedy: '米や南瓜の自然な甘みで消化器を元気づけ、適度な苦味で湿気を取り除きます。',
+                foods: 'かぼちゃ、とうもろこし、大豆、ハトムギ、小豆',
+                color: 'text-amber-700'
+            },
+            autumn: {
+                name: '秋（9月〜11月）',
+                problem: '空気が乾燥し、呼吸器（肺）や皮膚が乾きやすい。喉の痛みや便の乾燥が起こります。',
+                lack: '体内のみずみずしさを生む「酸」と「甘」の組み合わせ（酸甘化陰）が不足。',
+                remedy: '発散しすぎる辛味を控えめにし、酸味と自然な甘みで身体に潤いを与えます。',
+                foods: '梨、レンコン、ぶどう、はちみつ、山芋',
+                color: 'text-orange-700'
+            },
+            winter: {
+                name: '冬（12月〜2月）',
+                problem: '寒さで血管が収縮して代謝が落ち、生命力の源である「腎」に負担がかかります。',
+                lack: '芯から体を温める「辛」と、腎の働きをサポートする「鹹（塩気）」が不足。',
+                remedy: '温熱性の辛味で血行を促し、海藻類などの鹹味で腎の蓄えを助けます。',
+                foods: '生姜、わかめ、黒ごま、ネギ、ニンニク',
+                color: 'text-blue-700'
+            }
+        };
+
+        const symptomMap = {
+            fatigue: { taste: '酸', reason: 'エネルギー（気）が外に漏れ出ています。梅干しや酢の酸味でしっかり閉じ込めましょう。', food: '梅干し・酢・レモン' },
+            cold: { taste: '辛', reason: '身体の血行が滞り冷えています。生姜や唐辛子の辛味で発散＆芯から温めましょう。', food: '生姜・ネギ・ニンニク' },
+            stress: { taste: '甘', reason: '精神的な緊張で身体がこわばっています。米や南瓜の優しい甘みで緊張を緩めましょう。', food: 'かぼちゃ・さつまいも・米' },
+            digest: { taste: '甘', reason: '胃腸（脾）が疲弊しています。消化に良い食材の自然な甘みでエネルギーを補益します。', food: '米粥・キャベツ・大豆' },
+            edema: { taste: '苦', reason: '余分な湿気（水分）が体内に溜まっています。緑茶や苦味野菜の清熱・燥湿作用で排出し出しましょう。', food: '緑茶・ゴーヤ・小松菜' },
+            constip: { taste: '鹹', reason: 'お通じが硬く滞っています。海藻類に含まれる鹹味（塩気）で軟化させて潤滑に整えます。', food: 'わかめ・昆布・塩昆布' }
+        };
+
+        const singleLifeData = {
+            symptomTips: {
+                fatigue: {
+                    dry: '梅干し（常温・長期保存可能）、干しあんず、クコの実',
+                    freeze: 'ポッカレモン等の瓶を常備。梅干しの種はスープの出汁に投入',
+                    add: 'お味噌汁やスープの仕上げにお酢を「ひとまわし」',
+                    recipeName: 'キャベツと豚肉のお酢さっぱり和漢スープ',
+                    recipeDesc: 'キャベツの自然な甘み（甘）＋豚肉の旨味に、仕上げのお酢（酸）を足してエネルギーを密封＆疲労回復！'
+                },
+                cold: {
+                    dry: '乾燥唐辛子、ブラックペッパー、粉末生姜、乾燥シソ',
+                    freeze: 'すりおろし生姜をラップで薄く伸ばして冷凍保存、刻み長ネギ',
+                    add: '出汁やラーメンに生姜ペーストとごま油を「ひとさじ」',
+                    recipeName: 'あまり野菜と豆腐のぽかぽか生姜スープ',
+                    recipeDesc: '冷凍ネギ＋生姜（辛）＋味噌（鹹）のトリプル効果で血行を即座に促進し、身体の芯から温めます。'
+                },
+                stress: {
+                    dry: '干し芋、レーズン、ドライなつめ、栗の甘露煮',
+                    freeze: 'かぼちゃ・さつまいものダイスカット冷凍保存パック',
+                    add: 'ホットミルクや白湯に蜂蜜を「かるく1さじ」',
+                    recipeName: '玉ねぎとかぼちゃのほっこり甘み和漢汁',
+                    recipeDesc: '自然な糖質（甘）の働きで、ストレスで強張った胃腸と自律神経の緊張をフワッと緩めます。'
+                },
+                digest: {
+                    dry: '切り干し大根、パックご飯、乾燥大豆',
+                    freeze: 'キャベツ・人参のざく切り小分け冷凍パック',
+                    add: 'お粥やすりおろし生姜をほんの少々プラス',
+                    recipeName: '冷凍キャベツと卵のやさしい雑炊',
+                    recipeDesc: 'キャベツとご飯の自然な甘み（甘）で弱った胃腸の粘膜を休ませ、無理なく栄養を吸収させます。'
+                },
+                edema: {
+                    dry: '緑茶ティーバッグ、ハトムギ茶、切り干し大根',
+                    freeze: '小松菜やほうれん草のアク抜き冷凍パック',
+                    add: 'カップスープの出汁代わりに緑茶を注いで和風仕立てに',
+                    recipeName: 'カットわかめと小松菜の緑茶出汁お茶漬け',
+                    recipeDesc: '緑茶と小松菜の苦味（苦）が持つ清熱・燥湿作用で、体内に停滞した無駄な水分をサラッと排出。'
+                },
+                constip: {
+                    dry: 'カットわかめ、塩昆布、ひじき、だし昆布',
+                    freeze: 'きのこミックス（ぶなしめじ・舞茸）を冷凍ストック',
+                    add: 'お湯に塩昆布を「ひとつまみ」＆ごま油',
+                    recipeName: 'きのことわかめの塩昆布和漢スープ',
+                    recipeDesc: 'わかめや塩昆布の鹹味（鹹）がもつ軟堅作用で、お通じを柔らかく整えてスムーズな排出を助けます。'
+                }
+            },
+            seasonTips: {
+                spring: {
+                    dry: '梅干し、干ししいたけ、干し芋',
+                    freeze: '大葉・小ネギの刻み冷凍パック',
+                    add: 'スープや炒め物にポン酢や酢をひとまわし',
+                    recipeName: '春のデトックス！さわやか梅出汁スープ',
+                    recipeDesc: '酸味（酸）の収斂作用で春に上昇しやすい気を抑え、肝のオーバーヒートを防ぎます。'
+                },
+                summer: {
+                    dry: '緑茶ティーバッグ、カットわかめ、ハトムギ茶',
+                    freeze: 'トマトの丸ごと冷凍、ゴーヤ薄切り冷凍',
+                    add: '冷やし麦茶に塩をひとつまみ＋レモン果汁',
+                    recipeName: 'ゴーヤとトマトのさっぱり夏冷ましスープ',
+                    recipeDesc: '苦味（苦）で身体の熱を逃がし、酸味（酸）で汗と一緒に流出する潤いをがっちりガード。'
+                },
+                doyo: {
+                    dry: '切り干し大根、乾燥あずき、干し柿',
+                    freeze: 'とうもろこし・かぼちゃの角切り冷凍パック',
+                    add: '温かいお汁に蜂蜜やみりんをほんの少々',
+                    recipeName: 'かぼちゃととうもろこしの甘味和漢ポタージュ',
+                    recipeDesc: '自然な甘み（甘）で湿気に負けやすい胃腸（脾）を元気づけ、夏バテを予防します。'
+                },
+                autumn: {
+                    dry: 'レーズン、干し芋、白ごま',
+                    freeze: 'すりおろし蓮根の小分け冷凍パック',
+                    add: 'ホットミルクやスープに蜂蜜を1さじ',
+                    recipeName: 'レンコンと蜂蜜のうるおい潤肺スープ',
+                    recipeDesc: '潤いを生む酸甘（酸＋甘）の組み合わせで、秋の空気に負けない喉と肌の潤いを保ちます。'
+                },
+                winter: {
+                    dry: '乾燥唐辛子、黒ごま、カットわかめ、塩昆布',
+                    freeze: 'すりおろし生姜の薄伸ばし冷凍、刻みニンニク',
+                    add: '味噌汁に生姜ペーストとごま油をプラス',
+                    recipeName: '黒ごまと生姜のあったか和漢ぽかぽかスープ',
+                    recipeDesc: '辛味（辛）で巡りを良くして身体を芯から温め、黒い食材と鹹味（鹹）で冬の「腎」を補益します。'
+                }
+            }
+        };
+
+        let selectedSymptoms = new Set();
+        let currentSeason = 'spring';
+        let myChart;
+
+        function initChart(mode) {
+            const ctx = document.getElementById('tasteChart').getContext('2d');
+            const config = {
+                type: 'radar',
+                data: {
+                    labels: data[mode].labels,
+                    datasets: [{
+                        label: 'バランス指標',
+                        data: data[mode].values,
+                        backgroundColor: mode === 'modern' ? 'rgba(74, 111, 165, 0.25)' : 'rgba(139, 94, 52, 0.25)',
+                        borderColor: mode === 'modern' ? '#4a6fa5' : '#8b5e34',
+                        pointBackgroundColor: mode === 'modern' ? '#4a6fa5' : '#8b5e34',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: mode === 'modern' ? '#4a6fa5' : '#8b5e34'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: { 
+                            suggestedMin: 0, 
+                            suggestedMax: 10,
+                            ticks: { display: false },
+                            grid: { color: 'rgba(0, 0, 0, 0.06)' },
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            };
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, config);
+        }
+
+        function switchView(mode) {
+            document.getElementById('btn-modern').className = mode === 'modern' 
+                ? 'px-5 py-2 rounded-full transition text-xs md:text-sm font-medium bg-white shadow-sm text-stone-800' 
+                : 'px-5 py-2 rounded-full transition text-xs md:text-sm font-medium text-stone-600 hover:text-stone-900';
+            document.getElementById('btn-tcm').className = mode === 'tcm' 
+                ? 'px-5 py-2 rounded-full transition text-xs md:text-sm font-medium bg-white shadow-sm text-stone-800' 
+                : 'px-5 py-2 rounded-full transition text-xs md:text-sm font-medium text-stone-600 hover:text-stone-900';
+            
+            const display = document.getElementById('content-display');
+            display.innerHTML = `
+                <div class="fade-in">
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">${data[mode].title}</h3>
+                    <p class="text-xs md:text-sm text-stone-600 mb-4 leading-relaxed">${data[mode].desc}</p>
+                    <div class="space-y-2.5">
+                        ${data[mode].items.map(item => `
+                            <div class="${item.color} p-3 rounded-xl border flex items-center justify-between text-xs md:text-sm shadow-sm">
+                                <span class="font-bold">${item.name}</span>
+                                <span class="text-xs opacity-90">${item.role}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            initChart(mode);
+        }
+
+        function switchSeason(key, btnElement) {
+            currentSeason = key;
+            const btns = document.querySelectorAll('.season-btn');
+            btns.forEach(b => b.classList.remove('active'));
+
+            const activeBtn = btnElement || document.querySelector(`.season-btn[data-season="${key}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            const s = seasons[key];
+            const content = document.getElementById('season-content');
+            content.classList.remove('fade-in');
+            void content.offsetWidth;
+            content.classList.add('fade-in');
+
+            content.innerHTML = `
+                <div>
+                    <h3 class="text-2xl font-bold ${s.color} mb-3">${s.name}</h3>
+                    <div class="space-y-3">
+                        <div class="bg-stone-50 p-3.5 rounded-xl border-l-4 border-stone-300">
+                            <h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-0.5">起こりやすい不調</h4>
+                            <p class="text-xs md:text-sm text-stone-700 leading-relaxed">${s.problem}</p>
+                        </div>
+                        <div class="bg-stone-50 p-3.5 rounded-xl border-l-4 border-stone-300">
+                            <h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-0.5">不足しやすい味</h4>
+                            <p class="text-xs md:text-sm text-stone-700 leading-relaxed">${s.lack}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-stone-800 text-white p-5 rounded-2xl shadow-inner border border-stone-700">
+                        <h4 class="font-bold text-sm mb-2 text-amber-300 flex items-center gap-1.5">
+                            <span>🌿</span> 養生ポイント
+                        </h4>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed mb-4">${s.remedy}</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${s.foods.split('、').map(f => `<span class="bg-stone-700 text-[11px] text-amber-200 px-2.5 py-1 rounded-full border border-stone-600">${f}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            updateTips();
+        }
+
+        function toggleSymptom(key, btnElement) {
+            const btn = btnElement || (window.event && window.event.currentTarget);
+            
+            if (selectedSymptoms.has(key)) {
+                selectedSymptoms.delete(key);
+                if (btn) btn.classList.remove('active');
+            } else {
+                selectedSymptoms.add(key);
+                if (btn) btn.classList.add('active');
+            }
+            
+            updateRecommendation();
+            updateTips();
+        }
+
+        function updateRecommendation() {
+            const box = document.getElementById('recommendation-box');
+            const content = document.getElementById('recommendation-content');
+            
+            if (selectedSymptoms.size === 0) { 
+                box.classList.add('hidden'); 
+                return; 
+            }
+            
+            box.classList.remove('hidden');
+            let html = '';
+            
+            selectedSymptoms.forEach(key => {
+                const s = symptomMap[key];
+                html += `
+                    <div class="bg-amber-50/50 p-3.5 rounded-xl border-l-4 border-amber-600/80">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="bg-amber-800 text-white font-bold text-[10px] px-2 py-0.5 rounded-full">補うべき味：${s.taste}</span>
+                        </div>
+                        <p class="text-xs md:text-sm font-bold text-stone-800 mb-1 leading-snug">${s.reason}</p>
+                        <p class="text-xs text-stone-600">手軽なおすすめ食材: <span class="font-semibold text-stone-800">${s.food}</span></p>
+                    </div>
+                `;
+            });
+            content.innerHTML = html;
+        }
+
+        function updateTips() {
+            const badge = document.getElementById('tips-status-badge');
+            const container = document.getElementById('tips-cards');
+            const recipeBox = document.getElementById('recipe-card');
+
+            let tipInfo = {};
+            let statusText = '';
+            
+            if (selectedSymptoms.size > 0) {
+                const activeArray = Array.from(selectedSymptoms);
+                const symptomNameMap = {
+                    fatigue: '疲労感', cold: '冷え', stress: 'イライラ',
+                    digest: '胃腸疲労', edema: 'むくみ', constip: '便秘'
+                };
+                
+                const names = activeArray.map(k => symptomNameMap[k]).join('・');
+                const requiredTastes = Array.from(new Set(activeArray.map(k => symptomMap[k].taste))).join(' / ');
+                
+                statusText = `⚡ 体調セルフチェック連動中: 「${names}」モード（必要な味: ${requiredTastes}）`;
+
+                // Aggregate lists for active symptoms
+                const primarySymptom = activeArray[0];
+                const primaryTip = singleLifeData.symptomTips[primarySymptom];
+
+                // Combine recommended items if multiple symptoms are checked
+                const combinedDry = activeArray.map(k => singleLifeData.symptomTips[k].dry).join('、');
+                const combinedFreeze = activeArray.map(k => singleLifeData.symptomTips[k].freeze).join('、');
+                const combinedAdd = activeArray.map(k => singleLifeData.symptomTips[k].add).join('、または');
+
+                const recommendedFoods = activeArray.map(k => symptomMap[k].food).join('＋');
+
+                recipeBox.innerHTML = `
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-amber-500 text-stone-950 font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">体調カスタム和漢スープ</span>
+                                <span class="text-xs text-amber-300">補う味: ${requiredTastes}</span>
+                            </div>
+                            <h4 class="text-xl md:text-2xl font-bold text-white tracking-wide">
+                                ${activeArray.length > 1 ? `【${names}】対策のオールインワン和漢スープ` : primaryTip.recipeName}
+                            </h4>
+                            <p class="text-xs md:text-sm text-stone-300 leading-relaxed max-w-2xl">
+                                ${activeArray.length > 1 
+                                    ? `選択した体調（${names}）に合わせて「${requiredTastes}」を網羅！おすすめ食材（${recommendedFoods}）を鍋に入れて煮込むだけで、不調を一括ケアできます。`
+                                    : primaryTip.recipeDesc
+                                }
+                            </p>
+                        </div>
+                        <div class="shrink-0 bg-stone-800/90 border border-amber-500/30 p-4 rounded-2xl text-center lg:text-right">
+                            <p class="text-[11px] text-stone-400 mb-1">調理時間 約5分・食品ロスゼロ</p>
+                            <p class="text-xs font-bold text-amber-300">余り野菜＋乾物・冷凍薬味を煮込むだけ！</p>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = `
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">📦</div>
+                        <h4 class="font-bold text-white text-base mb-1">おすすめ乾物ストック</h4>
+                        <p class="text-[11px] text-amber-400 font-semibold mb-3">賞味期限が長く無駄にならない</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${combinedDry}</p>
+                    </div>
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">❄️</div>
+                        <h4 class="font-bold text-white text-base mb-1">薬味・食材の冷凍活用</h4>
+                        <p class="text-[11px] text-amber-400 font-semibold mb-3">小分け・少量使用で食品ロス回避</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${combinedFreeze}</p>
+                    </div>
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">🥄</div>
+                        <h4 class="font-bold text-white text-base mb-1">仕上げの「1さじ」足し算</h4>
+                        <p class="text-xs text-amber-400 font-semibold mb-3">完成品に足りない味覚を即補給</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${combinedAdd}</p>
+                    </div>
+                `;
+
+            } else {
+                tipInfo = singleLifeData.seasonTips[currentSeason];
+                const seasonNames = { spring: '春', summer: '夏', doyo: '土用', autumn: '秋', winter: '冬' };
+                statusText = `💡 季節の養生連動中: 「${seasonNames[currentSeason]}」モード（体調チェック選択でカスタマイズ）`;
+
+                container.innerHTML = `
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">📦</div>
+                        <h4 class="font-bold text-white text-base mb-1">季節の乾物ストック</h4>
+                        <p class="text-[11px] text-amber-400 font-semibold mb-3">長期保存可能・季節の不調防止</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${tipInfo.dry}</p>
+                    </div>
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">❄️</div>
+                        <h4 class="font-bold text-white text-base mb-1">薬味・食材の冷凍活用</h4>
+                        <p class="text-[11px] text-amber-400 font-semibold mb-3">使い切り不要の小分け活用術</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${tipInfo.freeze}</p>
+                    </div>
+                    <div class="bg-stone-800 p-6 rounded-2xl border border-stone-700 shadow-md fade-in">
+                        <div class="text-3xl mb-3">🥄</div>
+                        <h4 class="font-bold text-white text-base mb-1">仕上げの「1さじ」足し算</h4>
+                        <p class="text-[11px] text-amber-400 font-semibold mb-3">惣菜・スープへ手軽に追記</p>
+                        <p class="text-xs md:text-sm text-stone-300 leading-relaxed">${tipInfo.add}</p>
+                    </div>
+                `;
+
+                recipeBox.innerHTML = `
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-amber-500 text-stone-950 font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">季節の無駄ゼロ和漢レシピ</span>
+                            </div>
+                            <h4 class="text-xl md:text-2xl font-bold text-white tracking-wide">${tipInfo.recipeName}</h4>
+                            <p class="text-xs md:text-sm text-stone-300 leading-relaxed max-w-2xl">${tipInfo.recipeDesc}</p>
+                        </div>
+                        <div class="shrink-0 bg-stone-800/90 border border-amber-500/30 p-4 rounded-2xl text-center lg:text-right">
+                            <p class="text-[11px] text-stone-400 mb-1">調理時間 約5分・食品ロスゼロ</p>
+                            <p class="text-xs font-bold text-amber-300">余り野菜を入れて煮込むだけで即完成！</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            badge.innerHTML = `<span class="pulse-subtle">✨</span> ${statusText}`;
+        }
+
+        window.onload = () => {
+            switchView('modern');
+            switchSeason('spring');
+            updateTips();
+        };
+    </script>
+</body>
+</html>
