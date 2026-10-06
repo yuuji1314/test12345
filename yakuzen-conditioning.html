@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>薬膳コンディショニング手帳 - 六味・陰陽・子午流注完全版</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap');
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+        .serif-font {
+            font-family: 'Noto Serif JP', serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md">
+                    <i data-lucide="leaf" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                        薬膳コンディショニング手帳
+                        <span id="season-badge" class="text-xs px-2.5 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-800 border border-emerald-200"></span>
+                    </h1>
+                    <p class="text-xs text-slate-500">六味・陰陽・子午流注による24時間・四季の体調コントロール</p>
+                </div>
+            </div>
+
+            <!-- Global Season Switcher -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <span class="text-xs font-bold text-slate-500 px-2 flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 季節:
+                </span>
+                <button onclick="changeGlobalSeason('spring')" id="btn-season-spring" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">🌸 春</button>
+                <button onclick="changeGlobalSeason('summer')" id="btn-season-summer" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">🌻 夏</button>
+                <button onclick="changeGlobalSeason('autumn')" id="btn-season-autumn" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">🍁 秋</button>
+                <button onclick="changeGlobalSeason('winter')" id="btn-season-winter" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">❄️ 冬</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b border-slate-200 shadow-2xs sticky top-[65px] z-20">
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2 custom-scrollbar">
+            <button onclick="switchTab('diagnostic')" id="tab-btn-diagnostic" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-emerald-600 text-white shadow-sm">
+                <i data-lucide="stethoscope" class="w-4 h-4"></i> セルフチェック & 最適処方
+            </button>
+            <button onclick="switchTab('ziwuliuzhu')" id="tab-btn-ziwuliuzhu" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="clock" class="w-4 h-4"></i> 子午流注 24時間体内時計
+            </button>
+            <button onclick="switchTab('matrix')" id="tab-btn-matrix" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="grid" class="w-4 h-4"></i> 四季薬膳マトリックス
+            </button>
+            <button onclick="switchTab('dictionary')" id="tab-btn-dictionary" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="book-open" class="w-4 h-4"></i> 食材図鑑 (PDF全網羅)
+            </button>
+            <button onclick="switchTab('recipes')" id="tab-btn-recipes" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="utensils" class="w-4 h-4"></i> 薬膳レシピ集 (全24選)
+            </button>
+            <button onclick="switchTab('theory')" id="tab-btn-theory" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="book" class="w-4 h-4"></i> 基礎理論 (六味・陰陽・昇降)
+            </button>
+            <button onclick="switchTab('journal')" id="tab-btn-journal" class="tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                <i data-lucide="notebook-pen" class="w-4 h-4"></i> 日記ログ & 薬膳茶集
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 overflow-y-auto">
+
+        <!-- TAB 1: Diagnostic Engine -->
+        <section id="tab-content-diagnostic" class="space-y-6">
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i> 体調セルフチェック & 最適処方エンジン
+                </h2>
+                <p class="text-sm text-emerald-100">
+                    現在選択中の季節（<span id="diag-current-season-label" class="font-bold underline text-amber-300">夏</span>）と、気になるお悩みを選択してください。東洋医学の「四気五味・陰陽バランス」に基づき、今のあなたに最適な食材とメニューを導き出します。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left: Questionnaires -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">①</span>
+                            陰陽・体質の傾向
+                        </h3>
+                        <div class="grid grid-cols-3 gap-2" id="yin-yang-buttons">
+                            <button onclick="selectYinYang('yang')" id="btn-yin-yang-yang" class="p-3 rounded-xl border border-slate-200 text-center transition-all hover:border-emerald-500">
+                                <div class="text-lg mb-1">🔥</div>
+                                <div class="text-xs font-bold">陽（熱証）</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">のぼせ・熱がり</div>
+                            </button>
+                            <button onclick="selectYinYang('ping')" id="btn-yin-yang-ping" class="p-3 rounded-xl border border-slate-200 text-center transition-all hover:border-emerald-500">
+                                <div class="text-lg mb-1">⚖️</div>
+                                <div class="text-xs font-bold">平（中庸）</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">バランス安定</div>
+                            </button>
+                            <button onclick="selectYinYang('yin')" id="btn-yin-yang-yin" class="p-3 rounded-xl border border-slate-200 text-center transition-all hover:border-emerald-500">
+                                <div class="text-lg mb-1">❄️</div>
+                                <div class="text-xs font-bold">陰（寒証）</div>
+                                <div class="text-[10px] text-slate-500 mt-0.5">冷え・寒がり</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">②</span>
+                            いま最も気になる体調・お悩み
+                        </h3>
+                        <div class="space-y-2.5" id="symptoms-container">
+                            <!-- Dynamic symptom buttons with seasonal descriptions inserted via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Results -->
+                <div class="lg:col-span-2 space-y-4" id="prescription-result-container">
+                    <!-- Results dynamically rendered -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Zi Wu Liu Zhu (Circadian Clock) -->
+        <section id="tab-content-ziwuliuzhu" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-teal-800 to-emerald-900 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="clock" class="w-5 h-5 text-amber-300"></i> 子午流注（しごりゅうちゅう）24時間体内時計養生
+                </h2>
+                <p class="text-sm text-teal-100">
+                    東洋医学の時間医学に基づき、2時間ごとに気が巡る臓腑（12時辰）を解説。現在の時間帯を自動検出し、さらに<span id="clock-season-name" class="font-bold underline text-amber-300">夏</span>の気候変化に合わせて最適な過ごし方・飲食のヒントを提案します。
+                </p>
+            </div>
+
+            <!-- Current Time Status Card -->
+            <div id="current-clock-card" class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <!-- 12 Shishin Grid Selector -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i> 12時辰（2時間刻み）の臓腑バイオリズムを選択
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5" id="shishin-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Detailed Shishin View -->
+            <div id="shishin-detail-container" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 3: Seasonal Matrix -->
+        <section id="tab-content-matrix" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-emerald-700 to-teal-800 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="grid" class="w-5 h-5 text-amber-300"></i> 四季の薬膳マトリックス
+                </h2>
+                <p class="text-sm text-emerald-100">
+                    四季折々の気候の変化（春の風邪・夏の暑湿・秋の乾燥・冬の寒冷）に対し、五臓（肝・心・肺・腎）をいかに養生するかを一覧化しています。
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2" id="matrix-season-tabs">
+                <button onclick="setMatrixSeason('spring')" id="matrix-tab-spring" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🌸 春の養生 (肝・解毒)</button>
+                <button onclick="setMatrixSeason('summer')" id="matrix-tab-summer" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🌻 夏の養生 (心・清暑)</button>
+                <button onclick="setMatrixSeason('autumn')" id="matrix-tab-autumn" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🍁 秋の養生 (肺・潤燥)</button>
+                <button onclick="setMatrixSeason('winter')" id="matrix-tab-winter" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">❄️ 冬の養生 (腎・温補)</button>
+            </div>
+
+            <div id="matrix-content-container" class="space-y-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 4: Dictionary (PDF Full Ingredients) -->
+        <section id="tab-content-dictionary" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-teal-800 to-emerald-800 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="book-open" class="w-5 h-5 text-amber-300"></i> 食材図鑑（PDF全網羅データベース）
+                </h2>
+                <p class="text-sm text-teal-100">
+                    ご提示いただいた「四季の旬食材リスト（春・夏・秋・冬の地方野菜、天然山菜、鮮魚、ジビエ、きのこ等）」のすべての食材を網羅。六味・五性・帰経・昇降属性を完備しています。
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500">季節フィルター:</span>
+                        <button onclick="setDictSeasonFilter('all')" id="dict-season-all" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">すべて</button>
+                        <button onclick="setDictSeasonFilter('spring')" id="dict-season-spring" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">🌸 春</button>
+                        <button onclick="setDictSeasonFilter('summer')" id="dict-season-summer" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">🌻 夏</button>
+                        <button onclick="setDictSeasonFilter('autumn')" id="dict-season-autumn" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">🍁 秋</button>
+                        <button onclick="setDictSeasonFilter('winter')" id="dict-season-winter" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">❄️ 冬</button>
+                    </div>
+                    <div class="w-full sm:w-72">
+                        <div class="relative">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                            <input type="text" id="dict-search-input" oninput="filterDictionary()" placeholder="食材名、味、効能で検索..." class="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                    <span class="text-xs font-bold text-slate-500">カテゴリ:</span>
+                    <button onclick="setDictCategoryFilter('all')" id="dict-cat-all" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-600 text-white">すべて</button>
+                    <button onclick="setDictCategoryFilter('野菜・地方野菜')" id="dict-cat-野菜・地方野菜" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">野菜・地方野菜</button>
+                    <button onclick="setDictCategoryFilter('天然山菜')" id="dict-cat-天然山菜" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">天然山菜</button>
+                    <button onclick="setDictCategoryFilter('鮮魚・魚介')" id="dict-cat-鮮魚・魚介" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">鮮魚・魚介</button>
+                    <button onclick="setDictCategoryFilter('天然きのこ')" id="dict-cat-天然きのこ" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">天然きのこ</button>
+                    <button onclick="setDictCategoryFilter('ジビエ')" id="dict-cat-ジビエ" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">ジビエ</button>
+                    <button onclick="setDictCategoryFilter('その他')" id="dict-cat-その他" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">その他・和漢</button>
+                </div>
+            </div>
+
+            <!-- Dictionary Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="dictionary-grid">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 5: Recipes (All 24 Recipes) -->
+        <section id="tab-content-recipes" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-emerald-800 to-teal-800 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="utensils" class="w-5 h-5 text-amber-300"></i> 薬膳レシピ集（全24選・季節別）
+                </h2>
+                <p class="text-sm text-emerald-100">
+                    春夏秋冬それぞれの気候変動と体調のゆらぎに対応する、厳選薬膳メニュー24選。使用食材、五性・六味、調理のポイントを詳しく解説。
+                </p>
+            </div>
+
+            <!-- Recipe Season Selector -->
+            <div class="flex flex-wrap gap-2" id="recipe-season-tabs">
+                <button onclick="setRecipeSeason('spring')" id="recipe-tab-spring" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🌸 春のレシピ (6選)</button>
+                <button onclick="setRecipeSeason('summer')" id="recipe-tab-summer" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🌻 夏のレシピ (6選)</button>
+                <button onclick="setRecipeSeason('autumn')" id="recipe-tab-autumn" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">🍁 秋のレシピ (6選)</button>
+                <button onclick="setRecipeSeason('winter')" id="recipe-tab-winter" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200">❄️ 冬のレシピ (6選)</button>
+            </div>
+
+            <!-- Recipes Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recipes-grid">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 6: Theory (Six Tastes, Yin/Yang, Ascending/Descending) -->
+        <section id="tab-content-theory" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-teal-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="book" class="w-5 h-5 text-amber-300"></i> 薬膳の基礎理論（六味・陰陽・升降浮沈）
+                </h2>
+                <p class="text-sm text-teal-100">
+                    東洋医学における食養生の骨組みとなる「四気五味（六味）」「陰陽バランス」「気の巡り（升降浮沈）」のメカニズムを紐解きます。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Six Tastes Card -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2 text-base border-b border-slate-100 pb-3">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">味</span>
+                        六味（ろくみ）の機能特性
+                    </h3>
+                    <div class="space-y-3 text-xs text-slate-600">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">酸味（さんみ）</span>: 引き締め、収斂（すいれん）作用。汗や尿の出すぎを防ぐ（梅干し、トマト等）。
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">苦味（くみ）</span>: 熱を冷まし、余分な湿気を乾かす（ゴーヤ、山菜、キノコ等）。
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">甘味（かんみ）</span>: 滋養強壮、緊張を緩め痛みを和らげる（芋類、米、ナツメ等）。
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">辛味（しんみ）</span>: 巡りを良くし、発汗させて邪気を追い払う（生姜、ネギ、唐辛子等）。
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">鹹味（かんみ / 塩辛い）</span>: 固いものを軟らかくし、体液を補給する（海藻、貝類等）。
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <span class="font-bold text-slate-900 text-sm">淡味（たんみ / 旨味・薄味）</span>: 利尿作用を高め、むくみを解消する（冬瓜、ハトムギ、豆類等）。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qi Flow / Syoukou Fuchin Card -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center gap-2 text-base border-b border-slate-100 pb-3">
+                            <span class="w-8 h-8 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold">気</span>
+                            升降浮沈（しょうこうふちん）と四気
+                        </h3>
+                        <div class="space-y-3 text-xs text-slate-600">
+                            <p>食材には「体を温める・冷やす（四気：熱・温・平・涼・寒）」だけでなく、体内で気がどちらの方向に動くかのベクトルがあります。</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                                    <div class="font-bold text-emerald-900 text-sm mb-1">🔼 升・浮（上昇・発散）</div>
+                                    <p class="text-[11px]">気を上に持ち上げ、発汗や発散を促す。春や冷えの改善に。</p>
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                                    <div class="font-bold text-blue-900 text-sm mb-1">🔽 降・沈（下降・鎮静）</div>
+                                    <p class="text-[11px]">気を沈め、余分な熱や水分を下へ排泄する。夏やのぼせの改善に。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center gap-2 text-base border-b border-slate-100 pb-3">
+                            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">陰</span>
+                            陰陽バランスの基本法則
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            東洋医学では、万物は「陰（冷やす・潤す・静まる）」と「陽（温める・発散する・活動する）」のバランスで成り立っていると考えます。偏った体調（冷えすぎ＝陰過剰、のぼせ＝陽過剰）に対し、反対の性質を持つ食材を補うことで「中庸（平）」を保ちます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: Journal & Yakuzen Teas -->
+        <section id="tab-content-journal" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-teal-800 to-emerald-900 rounded-2xl p-6 text-white shadow-lg">
+                <h2 class="text-xl font-bold flex items-center gap-2 mb-2">
+                    <i data-lucide="notebook-pen" class="w-5 h-5 text-amber-300"></i> 日々のコンディショニングログ & 薬膳茶集（全8選）
+                </h2>
+                <p class="text-sm text-teal-100">
+                    毎日の体調・症状・食べた薬膳食材を記録して自身の傾向を把握。さらに、日常で手軽に淹れられる四季の養生薬膳茶・ドリンクレシピを収録しています。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Log Entry Form -->
+                <div class="lg:col-span-1 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i> 今日の体調・食事を記録
+                    </h3>
+                    <form onsubmit="saveJournalEntry(event)" class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1">日付</label>
+                            <input type="date" id="journal-date" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1">気になる症状</label>
+                            <select id="journal-symptom" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                                <option value="冷え・寒気">❄️ 冷え・寒気</option>
+                                <option value="のぼせ・ほてり">🔥 のぼせ・ほてり</option>
+                                <option value="むくみ・重だるさ">💧 むくみ・重だるさ</option>
+                                <option value="疲労感・気力低下">⚡ 疲労感・気力低下</option>
+                                <option value="快調・良好">✨ 快調・バランス安定</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1">陰陽傾向</label>
+                            <select id="journal-yinyang" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                                <option value="陰（冷え気味）">❄️ 陰（冷え気味）</option>
+                                <option value="平（中庸）">⚖️ 平（バランス良好）</option>
+                                <option value="陽（熱気味）">🔥 陽（熱気味）</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1">摂取した食材・薬膳茶</label>
+                            <input type="text" id="journal-food" placeholder="例：生姜湯、竹の子煮物、菊花茶" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1">体調メモ</label>
+                            <textarea id="journal-note" rows="2" placeholder="身体の温まり具合や変化などを記入..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1">
+                            <i data-lucide="save" class="w-4 h-4"></i> 体調ログを記録する
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Log History -->
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <i data-lucide="history" class="w-4 h-4 text-emerald-600"></i> 体調コンディショニング履歴
+                        </h3>
+                        <span class="text-xs text-slate-400" id="journal-count">0件の記録</span>
+                    </div>
+                    <div id="journal-history-list" class="space-y-3 max-h-[380px] overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yakuzen Teas Grid -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center flex-wrap gap-2">
+                    <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <i data-lucide="cup-soda" class="w-5 h-5 text-emerald-600"></i> 四季の日常薬膳茶・養生ドリンク（全8選）
+                    </h3>
+                    <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">デスクワーク・日常のお供に</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="yakuzen-teas-grid">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>薬膳コンディショニング手帳 © 2026 - 六味・陰陽・子午流注・四季旬食材完全統合版</p>
+    </footer>
+
+    <!-- App Logic Script -->
+    <script>
+        let currentSeason = 'summer'; // 'spring', 'summer', 'autumn', 'winter'
+        let currentTab = 'diagnostic';
+        let yinYangSelection = 'yin'; // 'yang', 'ping', 'yin'
+        let symptomSelection = 'cold'; // 'cold', 'heat', 'edema', 'fatigue'
+        
+        let dictSeasonFilterState = 'all';
+        let dictCategoryFilterState = 'all';
+        let matrixSeasonState = 'summer';
+        let recipeSeasonState = 'summer';
+        let activeShishinIndex = 0;
+
+        // --- ZI WU LIU ZHU CLOCK FUNCTIONS ---
+        function getCurrentShishinIndex() {
+            const hour = new Date().getHours();
+            if (hour >= 23 || hour < 1) return 0;
+            return Math.floor((hour - 1) / 2) + 1;
+        }
+
+        function initClock() {
+            activeShishinIndex = getCurrentShishinIndex();
+            updateClockStatus();
+            renderShishinGrid();
+            renderShishinDetail(activeShishinIndex);
+        }
+
+        function updateClockStatus() {
+            const currentIndex = getCurrentShishinIndex();
+            const currentObj = shishinData[currentIndex];
+            if (!currentObj) return;
+            const seasonData = currentObj[currentSeason];
+            const card = document.getElementById('current-clock-card');
+            if (!card) return;
+
+            const seasonNames = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
+
+            card.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-2xl shadow-inner font-bold">
+                        ${currentObj.icon}
+                    </div>
+                    <div>
+                        <div class="text-xs text-emerald-700 font-bold flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 現在の時間帯（${seasonNames[currentSeason]}の養生）
+                        </div>
+                        <h4 class="text-base font-bold text-slate-900 mt-0.5">${currentObj.name} : 活性化臓腑【${currentObj.organ}】</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">時間：${currentObj.hour} ／ 五行属性：${currentObj.element}</p>
+                    </div>
+                </div>
+                <div class="bg-emerald-50 p-3.5 rounded-xl border border-emerald-100 max-w-md text-xs space-y-1">
+                    <div class="font-bold text-emerald-900 flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-600"></i> ${seasonNames[currentSeason]}の推奨アクション
+                    </div>
+                    <p class="text-emerald-800 leading-relaxed">${seasonData.action}</p>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderShishinGrid() {
+            const grid = document.getElementById('shishin-grid');
+            if (!grid) return;
+
+            const currentIndex = getCurrentShishinIndex();
+
+            grid.innerHTML = shishinData.map((item, idx) => {
+                const isCurrent = idx === currentIndex;
+                const isActive = idx === activeShishinIndex;
+                let btnClass = "p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 ";
+                
+                if (isActive) {
+                    btnClass += "border-emerald-600 bg-emerald-600 text-white shadow-md ring-2 ring-emerald-500/20";
+                } else if (isCurrent) {
+                    btnClass += "border-emerald-400 bg-emerald-50 text-slate-900 font-bold ring-1 ring-emerald-400";
+                } else {
+                    btnClass += "border-slate-200 bg-white text-slate-700 hover:border-slate-300";
+                }
+
+                return `
+                    <button onclick="renderShishinDetail(${idx})" class="${btnClass}">
+                        <span class="text-xl">${item.icon}</span>
+                        <div class="text-xs font-bold">${item.name}</div>
+                        <div class="text-[10px] opacity-80">${item.organ}</div>
+                        ${isCurrent ? '<span class="text-[9px] bg-amber-300 text-amber-900 px-1.5 py-0.2 rounded-full font-bold mt-0.5">現在</span>' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderShishinDetail(idx) {
+            activeShishinIndex = idx;
+            renderShishinGrid();
+
+            const container = document.getElementById('shishin-detail-container');
+            if (!container) return;
+
+            const item = shishinData[idx];
+            const seasonData = item[currentSeason];
+            const seasonNames = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
+
+            container.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl font-bold">
+                            ${item.icon}
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">${item.hour}</span>
+                            <h3 class="text-lg font-bold text-slate-900 mt-1">${item.name}：${item.organ}（${item.element}の気）</h3>
+                        </div>
+                    </div>
+                    <div class="text-xs bg-amber-50 text-amber-800 px-3 py-1.5 rounded-xl border border-amber-200 font-bold flex items-center gap-1.5">
+                        <i data-lucide="calendar" class="w-4 h-4"></i> 現在適用中の季節：${seasonNames[currentSeason]}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-emerald-50/60 rounded-xl border border-emerald-100 space-y-1.5">
+                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> ${seasonNames[currentSeason]}の推奨行動
+                        </div>
+                        <p class="text-xs text-slate-700 leading-relaxed">${seasonData.action}</p>
+                    </div>
+
+                    <div class="p-4 bg-teal-50/60 rounded-xl border border-teal-100 space-y-1.5">
+                        <div class="text-xs font-bold text-teal-900 flex items-center gap-1.5">
+                            <i data-lucide="utensils" class="w-4 h-4 text-teal-600"></i> おすすめの飲食・お茶
+                        </div>
+                        <p class="text-xs text-slate-700 leading-relaxed">${seasonData.food}</p>
+                    </div>
+
+                    <div class="p-4 bg-rose-50/60 rounded-xl border border-rose-100 space-y-1.5">
+                        <div class="text-xs font-bold text-rose-900 flex items-center gap-1.5">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i> 注意すべきポイント
+                        </div>
+                        <p class="text-xs text-slate-700 leading-relaxed">${seasonData.warning}</p>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // --- SEASON UI UPDATER ---
+        function updateSeasonUI() {
+            const seasons = ['spring', 'summer', 'autumn', 'winter'];
+            seasons.forEach(s => {
+                const btn = document.getElementById(`btn-season-${s}`);
+                if (btn) {
+                    if (s === currentSeason) {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-600 text-white shadow-xs";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-700 hover:bg-slate-300";
+                    }
+                }
+            });
+
+            const badge = document.getElementById('season-badge');
+            const seasonNames = { spring: '🌸 春 (肝・解毒)', summer: '🌻 夏 (心・清暑)', autumn: '🍁 秋 (肺・潤燥)', winter: '❄️ 冬 (腎・温補)' };
+            if (badge) badge.textContent = seasonNames[currentSeason];
+
+            const diagLabel = document.getElementById('diag-current-season-label');
+            if (diagLabel) diagLabel.textContent = seasonNames[currentSeason];
+
+            const clockSeasonName = document.getElementById('clock-season-name');
+            if (clockSeasonName) clockSeasonName.textContent = seasonNames[currentSeason];
+        }
+
+        function autoDetectSeason() {
+            const month = new Date().getMonth() + 1; // 1-12
+            if (month >= 3 && month <= 5) return 'spring';
+            if (month >= 6 && month <= 8) return 'summer';
+            if (month >= 9 && month <= 11) return 'autumn';
+            return 'winter';
+        }
+
+        // --- FULL PDF & LIST INGREDIENTS DATABASE ---
+        const ingredientsDatabase = [
+            // 春
+            { id: 1, name: "竹の子", season: "spring", category: "野菜・地方野菜", taste: "甘", nature: "微寒", meridian: "胃・大腸", ascDesc: "降・沈", effect: "利尿・解毒、便秘解消、胃熱をとる", compatibility: "豚肉、ワカメ", tip: "米ぬかでアク抜きし、煮物や炊き込みご飯に。" },
+            { id: 2, name: "ホタルイカ", season: "spring", category: "鮮魚・魚介", taste: "鹹", nature: "平", meridian: "肝・腎", ascDesc: "降・沈", effect: "肝血を補う、滋養強壮、疲労回復", compatibility: "酢味噌、生姜", tip: "旬の酢味噌和えや生姜煮で." },
+            { id: 3, name: "たらの芽", season: "spring", category: "天然山菜", taste: "苦", nature: "寒", meridian: "肝・胃", ascDesc: "降・沈", effect: "春の解毒、余分な熱と湿気を排出", compatibility: "塩、天つゆ", tip: "天ぷらやさっと茹でてお浸しに。" },
+            { id: 4, name: "行者にんにく", season: "spring", category: "天然山菜", taste: "辛", nature: "温", meridian: "肝・腎", ascDesc: "升・浮", effect: "強い温補作用、血行促進、スタミナ増強", compatibility: "豚肉、卵", tip: "醤油漬けや炒め物に." },
+            { id: 5, name: "桜マス", season: "spring", category: "鮮魚・魚介", taste: "甘", nature: "温", meridian: "脾・胃", ascDesc: "升・浮", effect: "気血を補い、胃腸を温めて元気を出す", compatibility: "新タマネギ、キノコ", tip: "ホイル焼きやちゃんちゃん焼きに。" },
+            { id: 26, name: "花山椒", season: "spring", category: "天然山菜", taste: "辛", nature: "温", meridian: "脾・胃・腎", ascDesc: "升・浮", effect: "温中散寒、気の滞りを解消し、内臓を温める", compatibility: "牛肉、豆腐", tip: "花山椒鍋や牛肉のしぐれ煮のアクセントに。" },
+            { id: 27, name: "菊花", season: "spring", category: "その他", taste: "甘・苦", nature: "微寒", meridian: "肝・肺", ascDesc: "降・沈", effect: "平肝明目、頭痛・目の赤み・熱を沈める", compatibility: "クコの実、緑茶", tip: "さっと茹でて酢の物やお茶に浮かべて。" },
+            { id: 31, name: "極太アスパラ", season: "spring", category: "野菜・地方野菜", taste: "甘", nature: "涼", meridian: "肺・胃", ascDesc: "升・浮", effect: "利尿作用、疲労物質の排出、血管強化", compatibility: "ベーコン、バター", tip: "グリル焼きやスープに。" },
+            { id: 32, name: "加賀れんこん", season: "spring", category: "野菜・地方野菜", taste: "甘", nature: "平", meridian: "肺・胃・心", ascDesc: "降・沈", effect: "粘膜保護、止血、胃腸強化", compatibility: "鶏ミンチ、生姜", tip: "すり流し汁やはさみ揚げに。" },
+
+            // 夏
+            { id: 6, name: "だだ茶豆", season: "summer", category: "野菜・地方野菜", taste: "甘", nature: "平", meridian: "脾・胃", ascDesc: "平", effect: "気の巡りを良くし、むくみと疲労を改善", compatibility: "塩", tip: "シンプルに塩茹でで味わう。" },
+            { id: 7, name: "ジュンサイ", season: "summer", category: "野菜・地方野菜", taste: "淡", nature: "寒", meridian: "胃・膀胱", ascDesc: "降・沈", effect: "夏の激しい熱と湿기를清熱・利尿", compatibility: "酢醤油、生姜", tip: "冷製スープや酢の物に." },
+            { id: 8, name: "天然あゆ", season: "summer", category: "鮮魚・魚介", taste: "甘", nature: "平", meridian: "脾・胃", ascDesc: "平", effect: "胃腸を健やかにし、夏の食欲不振を改善", compatibility: "蓼酢（たでず）", tip: "塩焼きにして蓼酢でさっぱりと。" },
+            { id: 9, name: "由良ハモ", season: "summer", category: "鮮魚・魚介", taste: "甘", nature: "微温", meridian: "脾・腎", ascDesc: "升・浮", effect: "滋養強壮、夏の冷え対策、皮膚の潤い", compatibility: "梅肉、きゅうり", tip: "湯引きやハモすきに。" },
+            { id: 10, name: "岩ガキ", season: "summer", category: "鮮魚・魚介", taste: "鹹", nature: "涼", meridian: "腎・心", ascDesc: "降・沈", effect: "陰液を補い、夏のほてりやのぼせをしずめる", compatibility: "レモン", tip: "生食やレモン絞りで。" },
+            { id: 28, name: "生ウニ", season: "summer", category: "鮮魚・魚介", taste: "甘・鹹", nature: "平", meridian: "肝・腎", ascDesc: "降・沈", effect: "滋陰補血、冷えのない滋養供給、疲れを緩和", compatibility: "わさび、海苔", tip: "刺身やウニ丼でシンプルに味わう。" },
+            { id: 33, name: "三豊茄子", season: "summer", category: "野菜・地方野菜", taste: "甘", nature: "涼", meridian: "胃・大腸", ascDesc: "降・沈", effect: "余分な熱と水分を排出し、腫れを鎮める", compatibility: "味噌、生姜", tip: "田楽や揚げびたしに。" },
+            { id: 34, name: "マコモダケ", season: "summer", category: "野菜・地方野菜", taste: "甘", nature: "涼", meridian: "脾・胃", ascDesc: "升・浮", effect: "利尿・解毒、高血圧予防、胃腸の調子を整える", compatibility: "豚肉、キノコ", tip: "炒め物や天ぷらに。" },
+
+            // 秋
+            { id: 11, name: "香茸（こうたけ）", season: "autumn", category: "天然きのこ", taste: "甘", nature: "平", meridian: "胃・大腸", ascDesc: "降・沈", effect: "気の巡りを良くし、消化を助ける", compatibility: "鶏肉、ご飯", tip: "炊き込みご飯や土瓶蒸しに。" },
+            { id: 12, name: "マスタケ", season: "autumn", category: "天然きのこ", taste: "甘", nature: "平", meridian: "脾・胃", ascDesc: "平", effect: "胃腸の機能を高め、水分代謝を促す", compatibility: "バター、醤油", tip: "ソテーや汁物に。" },
+            { id: 13, name: "自然薯", season: "autumn", category: "野菜・地方野菜", taste: "甘", nature: "平", meridian: "肺・脾・腎", ascDesc: "降・沈", effect: "肺と腎を潤し、強力に気を補う", compatibility: "麦飯、卵", tip: "すりおろしてとろろご飯に。" },
+            { id: 14, name: "秋鮭", season: "autumn", category: "鮮魚・魚介", taste: "甘", nature: "温", meridian: "脾・胃", ascDesc: "升・浮", effect: "胃腸を温め、気血を補って冷えを予防", compatibility: "キノコ、バター", tip: "キノコと一緒にホイル焼きに。" },
+            { id: 15, name: "子持あゆ", season: "autumn", category: "鮮魚・魚介", taste: "甘", nature: "平", meridian: "脾・腎", ascDesc: "平", effect: "卵の栄養で腎を補い、滋養強壮", compatibility: "甘露煮", tip: "甘露煮や塩焼きに。" },
+            { id: 29, name: "百合根", season: "autumn", category: "野菜・地方野菜", taste: "甘・微苦", nature: "微寒", meridian: "肺・心", ascDesc: "降・沈", effect: "潤肺止咳、心を落ち着かせ不眠・空咳を和らげる", compatibility: "卵、銀杏", tip: "茶碗蒸しや素揚げ、スープに。" },
+            { id: 35, name: "紫ずきん", season: "autumn", category: "野菜・地方野菜", taste: "甘", nature: "平", meridian: "脾・腎", ascDesc: "平", effect: "ポリフェノール豊富、アンチエイジングと疲労回復", compatibility: "塩", tip: "塩茹でや枝豆感覚で。" },
+            { id: 36, name: "源助大根", season: "autumn", category: "野菜・地方野菜", taste: "辛・甘", nature: "涼", meridian: "肺・胃", ascDesc: "降・沈", effect: "消化を助け、痰を切る、胃の熱を取る", compatibility: "ブリ、豚肉", tip: "煮物やおでんに。" },
+
+            // 冬
+            { id: 16, name: "猪肉（ジビエ）", season: "winter", category: "ジビエ", taste: "甘", nature: "温", meridian: "脾・腎", ascDesc: "升・浮", effect: "体を芯から強力に温め、気血を補う", compatibility: "根菜、ネギ、味噌", tip: "ボタン鍋で根菜と一緒に煮込む。" },
+            { id: 17, name: "鹿肉（ジビエ）", season: "winter", category: "ジビエ", taste: "甘", nature: "温", meridian: "腎・肝", ascDesc: "升・浮", effect: "高タンパク低カロリー、下半身の冷え改善", compatibility: "生姜、赤ワイン", tip: "生姜煮やローストに。" },
+            { id: 30, name: "熊肉（ジビエ）", season: "winter", category: "ジビエ", taste: "甘", nature: "熱", meridian: "脾・腎", ascDesc: "升・浮", effect: "極上の温陽作用、滋養強壮、厳冬の冷えを根治", compatibility: "根菜、酒かす、味噌", tip: "熊鍋や煮込みで汁まで味わう。" },
+            { id: 18, name: "下仁田ねぎ", season: "winter", category: "野菜・地方野菜", taste: "辛", nature: "温", meridian: "肺・胃", ascDesc: "升・浮", effect: "発汗解表、寒邪を追い払い胃腸を温める", compatibility: "豚肉、味噌", tip: "じっくり焼いて甘みを引き出す。" },
+            { id: 19, name: "幻の黒ぼく大根", season: "winter", category: "野菜・地方野菜", taste: "辛・甘", nature: "涼", meridian: "肺・胃", ascDesc: "降・沈", effect: "消化促進、痰を取り除く、熱を冷ます", compatibility: "豚肉、ブリ", tip: "ブリ大根やふろふき大根に。" },
+            { id: 20, name: "間人がに", season: "winter", category: "鮮魚・魚介", taste: "鹹", nature: "寒", meridian: "肝・腎", ascDesc: "降・沈", effect: "陰液を補い、熱を冷まして関節を潤す", compatibility: "生姜酢", tip: "茹でガニやカニすきに。" },
+            { id: 21, name: "あん肝", season: "winter", category: "鮮魚・魚介", taste: "甘", nature: "平", meridian: "肝・腎", ascDesc: "降・沈", effect: "血を補い、冬の乾燥と冷えを防ぐ", compatibility: "ポン酢、もみじおろし", tip: "蒸しあん肝や鍋の具材に。" },
+
+            // 通年・その他
+            { id: 22, name: "生姜", season: "spring", category: "その他", taste: "辛", nature: "温", meridian: "肺・脾・胃", ascDesc: "升・浮", effect: "発汗解表、嘔吐を止める、冷え改善", compatibility: "紅茶、豚肉", tip: "千切りにしてスープや紅茶に。" },
+            { id: 23, name: "ナツメ", season: "autumn", category: "その他", taste: "甘", nature: "平", meridian: "脾・胃", ascDesc: "平", effect: "気を補い、精神を安定させる（安神）", compatibility: "クコの実、鶏肉", tip: "薬膳スープや煮出し茶に。" },
+            { id: 24, name: "白キクラゲ", season: "autumn", category: "その他", taste: "甘", nature: "平", meridian: "肺・胃・腎", ascDesc: "降・沈", effect: "肺を潤し、乾燥肌や空咳を防ぐ（滋陰潤肺）", compatibility: "ナツメ、氷砂糖", tip: "戻してスープやデザートに。" },
+            { id: 25, name: "ハトムギ", season: "summer", category: "その他", taste: "甘", nature: "微涼", meridian: "脾・胃・肺", ascDesc: "降・沈", effect: "利水滲湿、むくみ解消、肌荒れ改善", compatibility: "緑豆、お粥", tip: "お粥やハトムギ茶に。" }
+        ];
+
+        // --- 24 YAKUZEN RECIPES DATABASE ---
+        const recipesDatabase = [
+            // 春 (6)
+            { id: "r1", season: "spring", title: "菜の花とアサリの酒蒸し", type: "春の解毒・気の巡り", desc: "春に滞りがちな肝の気を巡らせ、アサリの鹹味で余分な水分と熱を排出します。", ingredients: "菜の花 1パック、アサリ 200g、生姜 5g、日本酒 大さじ2", taste: "辛・鹹", nature: "平", tip: "日本酒と生姜でアサリを蒸し、最後に菜の花をさっと合わせて苦味を活かします。" },
+            { id: "r2", season: "spring", title: "ホタルイカと新タマネギの辛味和え", type: "春の肝血補給・代謝促進", desc: "旬のホタルイカで肝血を補い、新タマネギの辛味と酢で春のむくみと頭重感をすっきり解消。", ingredients: "ホタルイカ 100g、新タマネギ 1/2個、酢味噌、生姜", taste: "酸・辛", nature: "微温", tip: "新タマネギは水にさらさず、空気に触れさせて辛味と薬効を残します。" },
+            { id: "r3", season: "spring", title: "竹の子と鶏肉の春便りスープ", type: "胃腸補気・利尿解毒", desc: "鶏肉で気を補い、竹の子の甘味と微寒の性質で春の胃熱と便秘を優しくデトックス。", ingredients: "竹の子水煮 150g、鶏モモ肉 100g、クコの実、出汁", taste: "甘", nature: "平", tip: "薄口醤油と生姜汁で上品に仕上げ、スープごといただきます。" },
+            { id: "r4", season: "spring", title: "行者にんにくと豚肉のスタミナ炒め", type: "温補散寒・疲労回復", desc: "強い温補作用を持つ行者にんにくと豚肉の組み合わせで、春の寒暖差に負けない身体を作ります。", ingredients: "行者ニンニク 50g、豚バラ肉 120g、醤油、ごま油", taste: "辛・甘", nature: "温", tip: "強火でさっと炒め合わせ、香気成分（アリシン）を逃がしません。" },
+            { id: "r5", season: "spring", title: "たらの芽と春野菜の温和え", type: "春の清熱・解毒", desc: "山菜特有の苦味で、冬の間に溜まった老廃物を一網打尽に排出する春の定番お浸し。", ingredients: "たらの芽 6本、コゴミ 50g、白だし、すりごま", taste: "苦", nature: "寒", tip: "茹でた後すぐに冷水に取り、鮮やかな緑色と適度な苦味を残します。" },
+            { id: "r6", season: "spring", title: "桜マスと新緑野菜のホイル蒸し", type: "気血補益・肝ケア", desc: "桜マスの上質な脂と気血を補うパワーを、キノコや新タマネギと一緒に包み焼きで閉じ込めます。", ingredients: "桜マス切身 2切、新タマネギ、キノコ、バター少々", taste: "甘", nature: "温", tip: "酒と塩を振り、ホイルでしっかり密閉して蒸し上げます。" },
+
+            // 夏 (6)
+            { id: "r7", season: "summer", title: "ゴーヤと豚肉のチャンプルー", type: "清熱解暑・補気養陰", desc: "苦味で心臓の熱を冷まし、豚肉と卵の甘味で夏のエネルギー切れを防ぐ最強コンビ。", ingredients: "ゴーヤ 1本、豚肉 100g、豆腐 1/2丁、卵 1個", taste: "苦・甘", nature: "涼", tip: "ゴーヤは塩揉みして軽く湯通しすると、程よい苦味に抑えられます。" },
+            { id: "r8", season: "summer", title: "冬瓜とハトムギの澄まし汁", type: "利水滲湿・清熱解毒", desc: "夏バテやむくみの原因となる体内の余分な湿気を、冬瓜とハトムギの力で尿として排泄。", ingredients: "冬瓜 200g、茹でハトムギ 大さじ2、生姜、お出汁", taste: "淡・甘", nature: "微涼", tip: "冬瓜は皮ごと調理すると利尿作用がさらに高まります。" },
+            { id: "r9", season: "summer", title: "ジュンサイとオクラの清熱冷製スープ", type: "潤燥清熱・胃腸調整", desc: "ツルッとしたぬめり成分が胃腸の粘膜を保護し、夏の激しい暑さと乾燥から身体を守ります。", ingredients: "ジュンサイ 50g、オクラ 3本、昆布だし、梅肉", taste: "酸・淡", nature: "寒", tip: "よく冷やした昆布だしにさっと茹でた具材を合わせます。" },
+            { id: "r10", season: "summer", title: "由良ハモと夏野菜の梅肉和え", type: "滋養強壮・収斂生津", desc: "ハモの温補効果と梅肉の酸味（収斂作用）で、汗をかきすぎた夏の体表を引き締めます。", ingredients: "ハモ湯引き 100g、キュウリ 1本、梅干し 1個", taste: "酸・甘", nature: "平", tip: "梅肉にみりん少々と刻み大葉を混ぜて爽やかに仕立てます。" },
+            { id: "r11", season: "summer", title: "天然アユの塩焼き 蓼酢添え", type: "健脾和胃・清熱", desc: "川の香りが高いアユを塩焼きにし、ピリッとした蓼酢（たでず）で消化を促進します。", ingredients: "天然アユ 2尾、塩、蓼（たで）の葉、酢", taste: "苦・酸", nature: "平", tip: "遠火の強火でじっくり焼き、頭から骨まで美味しくいただけます。" },
+            { id: "r12", season: "summer", title: "夏野菜とトマトの清熱スープ", type: "生津止渇・解熱", desc: "トマトの酸味と甘味が夏の乾いた喉と身体を潤し、熱のこもりを鎮める冷製仕立て。", ingredients: "堀田トマト 2個、玉ねぎ 1/4個、オリーブオイル、塩", taste: "酸・甘", nature: "涼", tip: "ミキサーで滑らかにし、冷蔵庫でしっかり冷やして召し上がれ。" },
+
+            // 秋 (6)
+            { id: "r13", season: "autumn", title: "白キクラゲとクコの潤いスープ", type: "滋陰潤肺・安神補血", desc: "秋の乾燥による空咳や肌荒れを防ぐため、白キクラゲのゼリー質で肺を強力に潤します。", ingredients: "白キクラゲ 10g、クコの実 10粒、ナツメ 4個、氷砂糖", taste: "甘", nature: "平", tip: "白キクラゲは水で戻して石づきを取り、とろみが出るまでじっくり煮込みます。" },
+            { id: "r14", season: "autumn", title: "蓮根と豚肉のさっぱり甘酢炒め", type: "収斂潤肺・健脾胃", desc: "秋の肺を潤すレンコンの収斂作用と、豚肉の滋養パワーを甘酢でさっと炒め合わせます。", ingredients: "レン根 150g、豚ロース 100g、黒酢、醤油、生姜", taste: "酸・甘", nature: "平", tip: "レン根は厚めの半月切りにし、食感を残すように手早く炒めます。" },
+            { id: "r15", season: "autumn", title: "天然きのこ（香茸・平茸）の滋養土瓶蒸し", type: "行気健胃・補気", desc: "秋の恵みである天然キノコの香りと旨味を凝縮し、胃腸の気を巡らせて消化を助けます。", ingredients: "香茸・平茸 50g、鶏ササミ 30g、三つ葉、すだち", taste: "甘", nature: "平", tip: "土瓶に具材とお出汁を張り、素材の香りを逃がさず蒸し上げます。" },
+            { id: "r16", season: "autumn", title: "自然薯のとろろ麦飯", type: "補肺益腎・滋養強壮", desc: "秋から冬にかけてパワーを蓄える自然薯をすりおろした、究極のアンチエイジング食。", ingredients: "自然薯 150g、麦飯 1膳、出汁、うずら卵、青海苔", taste: "甘", nature: "平", tip: "出汁と少量の薄口醤油を少しずつ加えながら、空気を含ませるように混ぜます。" },
+            { id: "r17", season: "autumn", title: "秋鮭とキノコのバター醤油焼き", type: "健脾温中・補気血", desc: "秋鮭の温性パワーとキノコの食物繊維で、冷え込む秋の胃腸を温めて元気を出します。", ingredients: "秋鮭切身 2切、シメジ・マイタケ 1パック、バター、醤油", taste: "甘・鹹", nature: "温", tip: "キノコから出た水分を飛ばしながら、香ばしいバター醤油で味付けます。" },
+            { id: "r18", season: "autumn", title: "百合根と銀杏の秋薫る茶碗蒸し", type: "潤肺安神・鎮咳", desc: "百合根のホクホクした甘味と微苦味が、秋の不眠やイライラをしずかに鎮めてくれます。", ingredients: "百合根 50g、銀杏 6粒、鶏肉、卵 2個、出汁", taste: "甘・苦", nature: "微寒", tip: "百合根は一粒ずつ剥がし、弱火でじっくり蒸すことで滑らかな口当たりに。" },
+
+            // 冬 (6)
+            { id: "r19", season: "winter", title: "エビとニラの温身中華スープ", type: "温補腎陽・気血巡り", desc: "下半身の冷えや腰痛が気になる冬に、エビとニラの強力な陽気で身体を芯から温めます。", ingredients: "むきエビ 100g、ニラ 1/2束、生姜スライス 3枚、鶏ガラスープ", taste: "甘・辛", nature: "温", tip: "生姜を多めに効かせ、スープを飲み干すことで全身がポカポカに。" },
+            { id: "r20", season: "winter", title: "黒豆と根菜の温か豚汁", type: "温中散寒・補腎益精", desc: "冬の腎を補う黒豆と下仁田ネギ・レンコンなどの根菜を味噌仕立てでじっくり煮込んだ具だくさん汁。", ingredients: "黒豆（煮豆可） 50g、下仁田ネギ 1本、根菜類、豚肉、味噌", taste: "鹹・甘", nature: "温", tip: "根菜類は皮ごと使い、身体を温める発酵味噌をたっぷり使用します。" },
+            { id: "r21", season: "winter", title: "猪肉と下仁田ネギの温補ボタン鍋", type: "強壮温陽・気血補充", desc: "冬のジビエの王様である猪肉と、甘みの強い下仁田ネギで厳冬の寒さを完全にシャットアウト。", ingredients: "猪肉スライス 150g、下仁田ネギ 2本、ごぼう、味噌・酒かす", taste: "甘・辛", nature: "熱", tip: "隠し味に酒かすと味噌を加えることで、保温効果がさらに持続します。" },
+            { id: "r22", season: "winter", title: "ブリ大根の温熱煮込み", type: "温中補虚・化痰止咳", desc: "ブリの良質な脂と幻の黒ぼく大根の消化酵素が、冬の冷えた胃腸を優しく労わり温めます。", ingredients: "ブリ切身 2切、大根 1/4本、生姜厚切り 3枚、醤油・みりん", taste: "鹹・甘", nature: "温", tip: "生姜をたっぷり入れ、大根がトロトロになるまで煮込みます。" },
+            { id: "r23", season: "winter", title: "鹿肉の生姜赤ワイン煮込み", type: "補血益気・下半身温め", desc: "高タンパク低カロリーな鹿肉を、生姜と赤ワインでトロトロに煮込んだ冬の贅沢温活メニュー。", ingredients: "鹿肉モモ 150g、生姜 10g、赤ワイン 100ml、コンソメ", taste: "甘・辛", nature: "温", tip: "圧力鍋を使うことで、鹿肉が驚くほど柔らかく仕上がります。" },
+            { id: "r24", season: "winter", title: "あん肝と根菜の濃厚温スープ", type: "滋陰補血・温腎", desc: "海のフォアグラと呼ばれるあん肝の濃厚なコクで、冬の乾燥と冷えから身体を守ります。", ingredients: "あん肝 80g、大根・人参 50g、ネギ、味噌", taste: "鹹・甘", nature: "平", tip: "あん肝はあらかじめ酒洗いして臭みを取り、お味噌汁のベースに溶かし込みます。" },
+        ];
+
+        // --- 8 YAKUZEN TEAS DATABASE ---
+        const yakuzenTeas = [
+            { id: "t1", season: "spring", title: "🌸 菊花薄荷（ミント）茶", target: "春の頭痛・目の赤み・のぼせ", ingredients: "乾燥菊花 3g、薄荷葉 2g、クコの実 5粒", effect: "肝の上がりすぎた熱を冷まし、頭と目をすっきり爽快に。" },
+            { id: "t2", season: "spring", title: "🌸 陳皮（柑橘皮）生姜茶", target: "春の気滞・お腹の張り・胃だるさ", ingredients: "陳皮 3g、生姜スライス 2枚、ハチミツ 少々", effect: "巡りの滞った気をスムーズにし、消化器系を温める。" },
+            { id: "t3", season: "summer", title: "🌻 緑豆ハトムギ冷やし茶", target: "夏のむくみ・熱のこもり・暑気あたり", ingredients: "ハトムギ 10g、緑豆 10g、水 500ml", effect: "体内の余分な熱と水湿を尿としてスッキリ排泄。" },
+            { id: "t4", season: "summer", title: "🌻 麦門冬と竹葉の清熱茶", target: "夏の渇き・のぼせ・動悸", ingredients: "麦門冬 5g、竹葉 2g、常温水", effect: "汗で失われた体液を補い（生津）、心の熱を冷ます。" },
+            { id: "t5", season: "autumn", title: "🍁 百合根ナツメ甘茶", target: "秋の乾燥・空咳・精神不安", ingredients: "乾燥百合根 5g、ナツメ 2個（割り）、ハチミツ", effect: "肺を優しく潤し、秋の憂鬱感や不眠を安らげる。" },
+            { id: "t6", season: "autumn", title: "🍁 梨と白キクラゲのハチミツ湯", target: "秋の喉の痛い空咳・肌の乾燥", ingredients: "すりおろし梨 1/4個、戻し白キクラゲ 少々、温水", effect: "喉の粘膜に潤いヴェールを与え、乾燥から徹底ガード。" },
+            { id: "t7", season: "winter", title: "❄️ 黒豆生姜シナモン紅茶", target: "冬の冷え症・下半身の寒気・腎陽虚", ingredients: "炒り黒豆 10g、生姜 2g、シナモンスティック 1本、紅茶", effect: "腎を温め、血流を指先・足先まで巡らせて体を芯から発熱。" },
+            { id: "t8", season: "winter", title: "❄️ 当帰ナツメ龍眼（りゅうがん）湯", target: "冬の血虚・貧血気味・肌のカサつき", ingredients: "ナツメ 2個、龍眼肉 3粒、クコの実 5粒", effect: "温かい養血パワーで血（栄養体液）を満たし冷えを吹き飛ばす。" }
+        ];
+
+        // --- ZI WU LIU ZHU (12 SHISHIN) DATABASE ---
+        const shishinData = [
+            { hour: "23:00 - 01:00", name: "子時（しじ）", organ: "胆（たん）", element: "木", icon: "🌙", 
+              spring: { action: "睡眠を最優先し、肝胆の解毒力を高める。", food: "カモミールティーや白湯", warning: "夜更かしや脂っこい夜食は胆のうに負担をかける。" },
+              summer: { action: "熱帯夜の寝苦しさを防ぎ、睡眠で気を鎮める。", food: "麦茶や常温の水", warning: "冷たいビールの飲み過ぎは睡眠の質を大きく低下させる。" },
+              autumn: { action: "乾燥した外気から身体を守り、早めの就寝を心がける。", food: "百合根茶やハチミツ白湯", warning: "夜中の冷え込みに注意し、喉の乾燥を防ぐ。" },
+              winter: { action: "厳冬の夜はしっかり布団で温まり、腎と胆の陽気を蓄える。", food: "生姜紅茶や黒豆茶", warning: "冷えた部屋での夜更かしは厳禁。" }
+            },
+            { hour: "01:00 - 03:00", name: "丑時（うしじ）", organ: "肝（かん）", element: "木", icon: "🌌", 
+              spring: { action: "深く眠り、肝の血を浄化して解毒を促進する。", food: "特になし（睡眠中）", warning: "夜間のスマホの光は肝血を消耗させるため厳禁。" },
+              summer: { action: "熱のこもった体をクールダウンし、肝に負担をかけない。", food: "常温の水少々", warning: "寝苦しさによるイライラを解消して入眠。" },
+              autumn: { action: "乾燥対策の保湿を万全にして眠りにつく。", food: "白湯", warning: "空気の乾燥で喉が痛まないよう加湿を。" },
+              winter: { action: "冷えを防ぎ、肝と腎の血流をしっかり保持する。", food: "特になし", warning: "足元の冷えで目が覚めないよう温かくして休む。" }
+            },
+            { hour: "03:00 - 05:00", name: "寅時（とらじ）", organ: "肺（はい）", element: "金", icon: "🌅", 
+              spring: { action: "全身に新しい気が巡り始める時間。深い呼吸を意識。", food: "起床後の温かい白湯", warning: "寒暖差の朝の冷気に直接触れないよう注意。" },
+              summer: { action: "早朝の涼しい空気を吸い込み、肺の気を整える。", food: "麦茶や水", warning: "朝の早い段階での冷房の直撃を避ける。" },
+              autumn: { action: "秋の乾燥した空気が肺を傷つけやすいため、朝の深呼吸は慎重に。", food: "ハチミツ湯", warning: "乾燥による朝の空咳に注意。" },
+              winter: { action: "凍える早朝の冷気から肺と気管支をしっかりガード。", food: "生姜白湯", warning: "冷たい空気を吸い込むと気管支が収縮するため注意。" }
+            },
+            { hour: "05:00 - 07:00", name: "卯時（うじ）", organ: "大腸（だいちょう）", element: "金", icon: "☀️", 
+              spring: { action: "コップ1杯の白湯を飲み、朝の排泄リズムを整える。", food: "白湯、旬の果物", warning: "朝食を抜かず、腸の蠕動運動を促す。" },
+              summer: { action: "朝の水分補給を行い、スムーズなデトックスを促す。", food: "常温の水や緑豆茶", warning: "冷たいジュースの一気飲みは腸を冷やすためNG。" },
+              autumn: { action: "乾燥による便秘を防ぐため、水と潤い食材をとる。", food: "白湯、梨やリンゴ", warning: "便秘は肺の乾燥を悪化させるため早めのケアを。" },
+              winter: { action: "冷えによる腸の機能低下を防ぎ、温かい朝食をとる。", food: "温かいスープ、根菜", warning: "冷たいサラダ中心の朝食は避ける。" }
+            },
+            { hour: "07:00 - 09:00", name: "辰時（たつじ）", organ: "胃（い）", element: "土", icon: "🍳", 
+              spring: { action: "一日の活動の源となる温かい朝食をしっかり食べる。", food: "竹の子の味噌汁、ご飯", warning: "冷たいヨーグルトや生野菜だけの朝食は胃腸を冷やす。" },
+              summer: { action: "食欲が落ちやすい夏も、胃腸に優しい朝食でエネルギー補給。", food: "お粥や温かいスープ", warning: "冷たいものの摂りすぎで胃もたれを起こしやすい。" },
+              autumn: { action: "胃腸を温め、秋の乾燥に負けない消化力をつける。", food: "自然薯とろろ、温かいご飯", warning: "暴飲暴食は胃に負担をかけるため腹八分目に。" },
+              winter: { action: "胃腸を温めて全身への気血の配分を高める。", food: "根菜の味噌汁、温かいおかず", warning: "冷え切った胃に冷たいものを入れるのは厳禁。" }
+            },
+            { hour: "09:00 - 11:00", name: "巳時（みじ）", organ: "脾（ひ）", element: "土", icon: "💼", 
+              spring: { action: "栄養の消化吸収がピーク。午前中の活動を活発に。", food: "お茶、ナッツ類少々", warning: "デスクワークで長時間同じ姿勢を続けず軽くストレッチ。" },
+              summer: { action: "熱中症に注意しながら水分とミネラルをこまめに補給。", food: "麦茶、梅干し", warning: "エアコンの効いた部屋で冷えすぎないよう調整。" },
+              autumn: { action: "脾胃の働きを高め、栄養を全身の肺と腎へ送り出す。", food: "サツマイモやカボチャ", warning: "甘いおやつの食べ過ぎは脾に湿気を溜める。" },
+              winter: { action: "消化吸収力を高め、体にしっかりエネルギーを備蓄する。", food: "温かいハーブティー", warning: "冷えによる胃腸の機能低下に気をつける。" }
+            },
+            { hour: "11:00 - 13:00", name: "午時（うまじ）", organ: "心（しん）", element: "火", icon: "🍱", 
+              spring: { action: "心臓の働きが高まる時間。バランスの良い昼食と軽い休息を。", food: "旬の野菜と魚の定食", warning: "イライラや激しい感情の昂りは心に負担をかける。" },
+              summer: { action: "夏の暑さで最も負担がかかる「心」。無理せず休息をとる。", food: "夏野菜を使った栄養食", warning: "炎天下の激しい運動や無理な活動は避ける。" },
+              autumn: { action: "心を穏やかに保ち、乾燥によるメンタルのゆらぎを防ぐ。", food: "温かいお茶とバランス昼食", warning: "忙しさで心拍数が上がりすぎないよう深呼吸。" },
+              winter: { action: "心陽（心臓の温めパワー）を保ち、寒さに備える。", food: "温かいスープ付きの昼食", warning: "急激な寒暖差に心臓を驚かせないよう防寒を。" }
+            },
+            { hour: "13:00 - 15:00", name: "未時（ひつじじ）", organ: "小腸（しょうちょう）", element: "火", icon: "☕", 
+              spring: { action: "栄養の仕分けと吸収が行われる。水分補給を怠らない。", food: "白湯や緑茶", warning: "油っこい間食は小腸の消化吸収を妨げる。" },
+              summer: { action: "水分とミネラルの代謝をスムーズにする時間。", food: "麦茶、ハトムギ茶", warning: "冷たい炭酸飲料のガブ飲みは厳禁。" },
+              autumn: { action: "栄養と水分の吸収効率を高め、乾燥に備える。", food: "お茶と少量の果物", warning: "冷たいものの摂りすぎによる腹痛に注意。" },
+              winter: { action: "吸収した栄養を全身に巡らせるための水分代謝を維持。", food: "温かいお茶", warning: "下半身の冷えが小腸の働きを低下させるため温める。" }
+            },
+            { hour: "15:00 - 17:00", name: "申時（さるじ）", organ: "膀胱（ぼうこう）", element: "水", icon: "💧", 
+              spring: { action: "水分代謝と老廃物の排泄が活発になる時間帯。", food: "水分補給（お白湯やハーブティー）", warning: "夕方の冷え込みに備えて一枚羽織る。" },
+              summer: { action: "汗や尿によるデトックスを促す。水分をしっかり摂る。", food: "スイカや夏野菜、お水", warning: "水分不足は尿の濃縮やむくみを引き起こす。" },
+              autumn: { action: "体内の水分バランスを整え、乾燥から身を守る。", food: "梨や水分を含む食材", warning: "夕方以降の冷たい水分の大量摂取は控える。" },
+              winter: { action: "寒さで滞りやすい水分代謝を促し、冷えをデトックス。", food: "黒豆茶や生姜湯", warning: "夕方以降の足の冷えに十分注意する。" }
+            },
+            { hour: "17:00 - 19:00", name: "酉時（とりじ）", organ: "腎（じん）", element: "水", icon: "🌆", 
+              spring: { action: "一日の疲れを癒し、生命エネルギー（腎精）を労う時間。", food: "夕食には黒豆や海藻を取り入れる", warning: "夜にかけての無理な残業や疲労の蓄積を避ける。" },
+              summer: { action: "夏の消耗を回復するため、栄養価の高い夕食を準備。", food: "ウナギや豚肉、スタミナ食", warning: "冷房による下半身の冷えをこの時間までにリセット。" },
+              autumn: { action: "冬と乾燥に備えて腎を養う食材でエネルギーを補給。", food: "山芋、銀杏、根菜", warning: "夜の冷たい外気に肌や呼吸器をさらさない。" },
+              winter: { action: "一日の冷えを完全にリセットし、腎の陽気を温存する。", food: "鍋料理、根菜のスープ", warning: "夜間の冷え込みから腰や足元を徹底的にガード。" },
+            },
+            { hour: "19:00 - 21:00", name: "戌時（いぬじ）", organ: "心包（しんぽう）", element: "火", icon: "🍲", 
+              spring: { action: "夕食を済ませ、精神的な緊張を緩めてリラックス。", food: "消化の良い温かい夕食", warning: "寝る直前の重い食事は心包と胃に負担をかける。" },
+              summer: { action: "一日の熱やイライラを鎮め、穏やかな夜の時間を過ごす。", food: "トマトスープや温野菜", warning: "夜遅くまでのパソコンやスマホ作業は控える。" },
+              autumn: { action: "心を落ち着かせ、睡眠の質を高める環境づくり。", food: "百合根やカモミールティー", warning: "乾燥した室内に長時間いないよう加湿する。" },
+              winter: { action: "心身を温め、心地よい睡眠への準備を整える。", food: "温かいお鍋やスープ", warning: "湯冷めしないよう入浴後はすぐに温まる。" }
+            },
+            { hour: "21:00 - 23:00", name: "亥時（いじ）", organ: "三焦（さんしょう）", element: "火", icon: "✨", 
+              spring: { action: "全身の水分代謝の通り道（三焦）を整え、完全休息へ。", food: "温かい白湯", warning: "テレビやスマホのブルーライトを避け、副交感神経優位に。" },
+              summer: { action: "熱帯夜でも睡眠環境を快適に整え、深い眠りへつく。", food: "水少々", warning: "冷房をつけたままの直風睡眠は避ける。" },
+              autumn: { action: "全身を温めて潤いを閉じ込め、静かな睡眠をとる。", food: "ハチミツ白湯", warning: "乾燥した空気の中で寝ないよう加湿器を活用。" },
+              winter: { action: "全身のエネルギーと体温を保ち、深い睡眠で腎を養う。", food: "特になし（就寝）", warning: "電気毛布や湯たんぽで布団の中を温かく保つ。" }
+            }
+        ];
+
+        // --- SEASONAL SYMPTOM DESCRIPTIONS ---
+        const seasonalSymptomDescriptions = {
+            spring: {
+                cold: { title: "❄️ 春先の寒暖差冷え", desc: "春先の激しい寒暖差や冷え込みにより、気血の巡りが滞り、首肩こりや頭痛が起きやすい状態。" },
+                heat: { title: "🔥 のぼせ・イライラ", desc: "春の陽気とストレスで肝の気が上部に突き上げ、イライラやのぼせ、目の充血が生じる状態。" },
+                edema: { title: "💧 春のむくみ・重だるさ", desc: "冬から春への移行期で代謝が追いつかず、余分な水分や老廃物が溜まりやすい状態。" },
+                fatigue: { title: "⚡ 春倦怠感・気力低下", desc: "環境の変化や自律神経の乱れにより、エネルギー（気）が不足し気だるさを感じる状態。" }
+            },
+            summer: {
+                cold: { title: "❄️ クーラー冷え", desc: "強い冷房や冷たい飲み物の摂りすぎで、胃腸の深部が冷えて機能低下を起こした状態。" },
+                heat: { title: "🔥 暑気あたり・のぼせ", desc: "激しい暑さと湿気により、心臓（心）に熱がこもり、ほてりや食欲不振が生じる状態。" },
+                edema: { title: "💧 水分滞留・むくみ", desc: "水分やビールの過剰摂取、汗の出すぎによる水分代謝異常で体が重だるい状態。" },
+                fatigue: { title: "⚡ 夏バテ・気力低下", desc: "暑さと発汗による気液両虚（エネルギーと水分不足）により著しく消耗した状態。" }
+            },
+            autumn: {
+                cold: { title: "❄️ 秋風の冷え", desc: "朝晩の冷え込みや冷たい秋風により、肺と体表の防衛力が低下した状態。" },
+                heat: { title: "🔥 残暑のほてり", desc: "秋口の残り暑さと乾燥が重なり、喉の乾燥や微熱感、イライラを感じる状態。" },
+                edema: { title: "💧 秋の水分バランス乱れ", desc: "季節の変わり目で乾燥と湿気が入り交じり、水分代謝が不安定な状態。" },
+                fatigue: { title: "⚡ 季節の変わり目の疲労", desc: "夏の疲れが抜けきらないところに秋の乾燥が加わり、全身が乾燥・疲弊した状態。" }
+            },
+            winter: {
+                cold: { title: "❄️ 厳冬の冷え・寒気", desc: "厳寒の気候により、腎の陽気が不足し、手足や下半身が芯から冷え切った状態。" },
+                heat: { title: "🔥 上熱下寒（のぼせ冷え）", desc: "下半身が極度に冷えることで、逆に気や熱が頭部に浮き上がり、のぼせや顔のほてりを生じる状態。" },
+                edema: { title: "💧 冬の水分停滞", desc: "寒さで汗や尿の排出バランスが崩れ、余分な水分が体内に溜まりやすくなった状態。" },
+                fatigue: { title: "⚡ 冬のエネルギー備蓄不足", desc: "寒さに対する防衛でエネルギー（腎陽）を大量に消耗し、気力が低下した状態。" }
+            }
+        };
+
+        // --- INITIALIZATION ON LOAD ---
+        document.addEventListener('DOMContentLoaded', () => {
+            currentSeason = autoDetectSeason();
+            matrixSeasonState = currentSeason;
+            recipeSeasonState = currentSeason;
+
+            updateSeasonUI();
+            initClock();
+            renderDiagnosticSymptoms();
+            runDiagnostic();
+            renderMatrix(currentSeason);
+            renderDictionary();
+            renderRecipes(currentSeason);
+            
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('journal-date');
+            if (dateInput) dateInput.value = today;
+
+            renderJournalLogs();
+            renderYakuzenTeas();
+            if (window.lucide) lucide.createIcons();
+
+            setInterval(updateClockStatus, 60000);
+        });
+
+        function changeGlobalSeason(season) {
+            currentSeason = season;
+            matrixSeasonState = season;
+            recipeSeasonState = season;
+            updateSeasonUI();
+            renderDiagnosticSymptoms();
+            runDiagnostic();
+            renderMatrix(season);
+            renderRecipes(season);
+            renderShishinDetail(activeShishinIndex);
+            updateClockStatus();
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const tabs = ['diagnostic', 'ziwuliuzhu', 'matrix', 'dictionary', 'recipes', 'theory', 'journal'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`tab-content-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (content && btn) {
+                    if (t === tabId) {
+                        content.classList.remove('hidden');
+                        btn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-emerald-600 text-white shadow-sm";
+                    } else {
+                        content.classList.add('hidden');
+                        btn.className = "tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all bg-slate-100 text-slate-600 hover:bg-slate-200";
+                    }
+                }
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // --- DIAGNOSTIC ENGINE ---
+        function renderDiagnosticSymptoms() {
+            const container = document.getElementById('symptoms-container');
+            if (!container) return;
+            const descs = seasonalSymptomDescriptions[currentSeason];
+            const symptoms = [
+                { id: 'cold', icon: '❄️', key: 'cold' },
+                { id: 'heat', icon: '🔥', key: 'heat' },
+                { id: 'edema', icon: '💧', key: 'edema' },
+                { id: 'fatigue', icon: '⚡', key: 'fatigue' }
+            ];
+
+            container.innerHTML = symptoms.map(s => {
+                const info = descs[s.key];
+                const isSelected = symptomSelection === s.key;
+                const activeClass = isSelected ? "border-emerald-600 bg-emerald-50/60 shadow-xs ring-2 ring-emerald-500/20" : "border-slate-200 hover:border-emerald-300";
+                return `
+                    <button onclick="selectSymptom('${s.key}')" class="w-full text-left p-3 rounded-xl border ${activeClass} transition-all flex items-start gap-3">
+                        <span class="text-xl mt-0.5">${s.icon}</span>
+                        <div>
+                            <div class="text-xs font-bold text-slate-900">${info.title}</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">${info.desc}</div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectYinYang(val) {
+            yinYangSelection = val;
+            ['yang', 'ping', 'yin'].forEach(v => {
+                const btn = document.getElementById(`btn-yin-yang-${v}`);
+                if (btn) {
+                    if (v === val) {
+                        btn.className = "p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-center transition-all shadow-xs ring-2 ring-emerald-500/20";
+                    } else {
+                        btn.className = "p-3 rounded-xl border border-slate-200 text-center transition-all hover:border-emerald-400";
+                    }
+                }
+            });
+            runDiagnostic();
+        }
+
+        function selectSymptom(symptom) {
+            symptomSelection = symptom;
+            renderDiagnosticSymptoms();
+            runDiagnostic();
+        }
+
+        function runDiagnostic() {
+            const container = document.getElementById('prescription-result-container');
+            if (!container) return;
+
+            const seasonNames = { spring: '🌸 春', summer: '🌻 夏', autumn: '🍁 秋', winter: '❄️ 冬' };
+            const symptomInfo = seasonalSymptomDescriptions[currentSeason][symptomSelection];
+            
+            let recommendedIngredients = ingredientsDatabase.filter(i => i.season === currentSeason).slice(0, 3);
+            let recommendedRecipes = recipesDatabase.filter(r => r.season === currentSeason).slice(0, 2);
+
+            let adviceText = "";
+            let recommendedTaste = "";
+            let recommendedNature = "";
+
+            if (symptomSelection === 'cold') {
+                recommendedTaste = "辛味・温性の甘味";
+                recommendedNature = "温（温める）";
+                adviceText = "体を芯から温める温性・熱性の食材を選び、生姜やネギなどの辛味で気血の巡りを促しましょう。冷たい生ものは控え、煮込む調理法が最適です。";
+            } else if (symptomSelection === 'heat') {
+                recommendedTaste = "苦味・酸味";
+                recommendedNature = "涼・寒（熱を冷ます）";
+                adviceText = "こもった熱やイライラを鎮めるため、苦味や涼性の食材でクーリングしましょう。酸味で汗や気の消耗を引き締めるのも効果的です。";
+            } else if (symptomSelection === 'edema') {
+                recommendedTaste = "淡味・鹹味";
+                recommendedNature = "平・微涼（水分代謝）";
+                adviceText = "余分な水分と湿気を尿として排泄する利水作用の高い食材（ハトムギ、冬瓜、豆類）を積極的に取り入れましょう。";
+            } else {
+                recommendedTaste = "甘味・温性";
+                recommendedNature = "平・温（滋養強壮）";
+                adviceText = "エネルギー（気）が不足しているため、消化吸収の良い甘味食材や山芋・豚肉などの滋養強壮食でエネルギーを補給しましょう。";
+            }
+
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">${seasonNames[currentSeason]}の処方箋</span>
+                            <h3 class="text-base font-bold text-slate-900 mt-1 flex items-center gap-2">
+                                <span>🎯 診断結果：${symptomInfo.title}</span>
+                            </h3>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">推奨される性質</div>
+                            <div class="text-xs font-bold text-emerald-700">${recommendedNature} ／ ${recommendedTaste}</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                        <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="info" class="w-4 h-4 text-emerald-600"></i> 東洋医学的メカニズムと養生アドバイス
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">${symptomInfo.desc} ${adviceText}</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="leaf" class="w-4 h-4 text-emerald-600"></i> 今すぐ取り入れたいおすすめ食材（${seasonNames[currentSeason]}旬）
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            ${recommendedIngredients.map(ing => `
+                                <div class="p-3.5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-slate-900 text-sm">${ing.name}</span>
+                                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-medium">${ing.nature}・${ing.taste}味</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-600 leading-snug">${ing.effect}</p>
+                                    <div class="text-[10px] text-emerald-700 font-medium pt-1 border-t border-emerald-100">💡 ${ing.tip}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="utensils" class="w-4 h-4 text-emerald-600"></i> 最適な薬膳メニュー
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${recommendedRecipes.map(rec => `
+                                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2 hover:border-emerald-300 transition-all">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-emerald-700">${rec.type}</span>
+                                        <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${rec.nature}・${rec.taste}味</span>
+                                    </div>
+                                    <h5 class="font-bold text-slate-900 text-sm">${rec.title}</h5>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">${rec.desc}</p>
+                                    <div class="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-lg">
+                                        <strong class="text-slate-700">材料：</strong>${rec.ingredients}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // --- SEASONAL MATRIX FUNCTIONS ---
+        const matrixData = {
+            spring: {
+                title: "🌸 春の養生マトリックス（肝の季節・解毒と気の巡り）",
+                desc: "冬の間に体内に溜まった老廃物をデトックスし、新陳代謝を高める季節。イライラや自律神経の乱れを防ぐため、気の巡りを良くする食材を選びます。",
+                organ: "肝（かん）＆ 胆（たん）",
+                climate: "風邪（ふうじゃ）と寒暖差",
+                taste: "酸味（引き締め） ＆ 辛味（気の巡り）",
+                nature: "微温〜平（冷やしすぎず温めすぎない）",
+                ingredients: "竹の子、ホタルイカ、たらの芽、行者にんにく、桜マス、花山椒、菊花、極太アスパラ",
+                menu: "菜の花とアサリの酒蒸し、ホタルイカと新タマネギの辛味和え"
+            },
+            summer: {
+                title: "🌻 夏の養生マトリックス（心の季節・暑熱と体液の消耗）",
+                desc: "厳しい暑さと湿気により、心臓（心）に負担がかかり、体液やエネルギーが消耗しやすい季節。熱を冷まし、余分な湿気を追い出します。",
+                organ: "心（しん）＆ 小腸（しょうちょう）",
+                climate: "暑邪（しょじゃ）と湿気（しっしゃ）",
+                taste: "苦味（熱を冷ます） ＆ 淡味・酸味（水分代謝と引き締め）",
+                nature: "涼・寒（熱を逃がす・冷やす）",
+                ingredients: "だだ茶豆、ジュンサイ、天然あゆ、由良ハモ、岩ガキ、生ウニ、三豊茄子、マコモダケ",
+                menu: "ゴーヤと豚肉のチャンプルー、冬瓜とハトムギの澄まし汁"
+            },
+            autumn: {
+                title: "🍁 秋の養生マトリックス（肺の季節・乾燥と潤い補給）",
+                desc: "空気が乾燥し、喉や肌のトラブル、空咳が起きやすい季節。肺を優しく潤し、冬に備えてエネルギーを蓄える養生を行います。",
+                organ: "肺（はい）＆ 大腸（だいちょう）",
+                climate: "燥邪（そうじゃ）と冷え込み",
+                taste: "辛味（少なめ） ＆ 甘味（潤いとエネルギー補給）",
+                nature: "平〜微涼（秋の涼しさに合わせる）",
+                ingredients: "香茸、マスタケ、自然薯、秋鮭、子持あゆ、百合根、紫ずきん、源助大根",
+                menu: "白キクラゲとクコの潤いスープ、蓮根と豚肉のさっぱり甘酢炒め"
+            },
+            winter: {
+                title: "❄️ 冬の養生マトリックス（腎の季節・寒さとエネルギーの蓄え）",
+                desc: "万物が静まり返る厳冬期。寒さから身体を守り、生命力の根源である「腎」を温めてエネルギーをしっかりと蓄える季節です。",
+                organ: "腎（じん）＆ 膀胱（ぼうこう）",
+                climate: "寒邪（かんじゃ）と凍結",
+                taste: "鹹味（塩辛い味・腎を養う） ＆ 温性の甘味",
+                nature: "温・熱（体を芯から温める）",
+                ingredients: "猪肉、鹿肉、熊肉、下仁田ねぎ、幻の黒ぼく大根、間人がに、あん肝",
+                menu: "エビとニラの温身中華スープ、猪肉と下仁田ネギの温補ボタン鍋"
+            }
+        };
+
+        function setMatrixSeason(season) {
+            matrixSeasonState = season;
+            ['spring', 'summer', 'autumn', 'winter'].forEach(s => {
+                const btn = document.getElementById(`matrix-tab-${s}`);
+                if (btn) {
+                    if (s === season) {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-bold transition-all bg-emerald-600 text-white shadow-xs";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+                    }
+                }
+            });
+            renderMatrix(season);
+        }
+
+        function renderMatrix(season) {
+            const container = document.getElementById('matrix-content-container');
+            if (!container) return;
+            const data = matrixData[season];
+
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">四季のマトリックス分析</span>
+                        <h3 class="text-lg font-bold text-slate-900 mt-1">${data.title}</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">${data.desc}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">標的臓腑</div>
+                            <div class="text-sm font-bold text-slate-900">${data.organ}</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">気候要因</div>
+                            <div class="text-sm font-bold text-slate-900">${data.climate}</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">推奨される味</div>
+                            <div class="text-sm font-bold text-emerald-700">${data.taste}</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">食材の性質</div>
+                            <div class="text-sm font-bold text-teal-700">${data.nature}</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-2">
+                        <div class="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-1.5">
+                            <h4 class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                                <i data-lucide="leaf" class="w-4 h-4 text-emerald-600"></i> 代表的な旬の食材（PDF全網羅データベースより）
+                            </h4>
+                            <p class="text-xs text-slate-700 leading-relaxed">${data.ingredients}</p>
+                        </div>
+
+                        <div class="p-4 bg-teal-50/50 rounded-xl border border-teal-100 space-y-1.5">
+                            <h4 class="text-xs font-bold text-teal-900 flex items-center gap-1.5">
+                                <i data-lucide="utensils" class="w-4 h-4 text-teal-600"></i> おすすめ薬膳メニュー例
+                            </h4>
+                            <p class="text-xs text-slate-700 leading-relaxed">${data.menu}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- DICTIONARY FUNCTIONS ---
+        function setDictSeasonFilter(season) {
+            dictSeasonFilterState = season;
+            ['all', 'spring', 'summer', 'autumn', 'winter'].forEach(s => {
+                const btn = document.getElementById(`dict-season-${s}`);
+                if (btn) {
+                    if (s === season) {
+                        btn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-xs";
+                    } else {
+                        btn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200";
+                    }
+                }
+            });
+            renderDictionary();
+        }
+
+        function setDictCategoryFilter(cat) {
+            dictCategoryFilterState = cat;
+            const cats = ['all', '野菜・地方野菜', '天然山菜', '鮮魚・魚介', '天然きのこ', 'ジビエ', 'その他'];
+            cats.forEach(c => {
+                const btn = document.getElementById(`dict-cat-${c}`);
+                if (btn) {
+                    if (c === cat) {
+                        btn.className = "px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-600 text-white shadow-xs";
+                    } else {
+                        btn.className = "px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200";
+                    }
+                }
+            });
+            renderDictionary();
+        }
+
+        function filterDictionary() {
+            renderDictionary();
+        }
+
+        function renderDictionary() {
+            const grid = document.getElementById('dictionary-grid');
+            if (!grid) return;
+
+            const searchInput = document.getElementById('dict-search-input');
+            const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+            const seasonNames = { spring: '🌸 春', summer: '🌻 夏', autumn: '🍁 秋', winter: '❄️ 冬' };
+
+            let filtered = ingredientsDatabase.filter(item => {
+                if (dictSeasonFilterState !== 'all' && item.season !== dictSeasonFilterState) return false;
+                if (dictCategoryFilterState !== 'all' && item.category !== dictCategoryFilterState) return false;
+                if (keyword !== "") {
+                    const matchText = (item.name + item.effect + item.taste + item.nature + item.category + item.meridian).toLowerCase();
+                    if (!matchText.includes(keyword)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400 text-xs">
+                        条件に一致する食材が見つかりませんでした。別のキーワードやフィルターをお試しください。
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3 flex flex-col justify-between hover:border-emerald-300 transition-all">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${seasonNames[item.season] || ''}・${item.category}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">${item.nature}・${item.taste}味</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base">${item.name}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">${item.effect}</p>
+                    </div>
+
+                    <div class="space-y-1.5 pt-2 border-t border-slate-100 text-[11px]">
+                        <div class="flex justify-between text-slate-500">
+                            <span>帰経: <strong class="text-slate-800">${item.meridian}</strong></span>
+                            <span>昇降: <strong class="text-slate-800">${item.ascDesc}</strong></span>
+                        </div>
+                        <div class="text-slate-500">
+                            相性: <strong class="text-slate-800">${item.compatibility}</strong>
+                        </div>
+                        <div class="text-emerald-700 bg-emerald-50 p-1.5 rounded-lg font-medium">
+                            💡 ${item.tip}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- RECIPES FUNCTIONS ---
+        function setRecipeSeason(season) {
+            recipeSeasonState = season;
+            ['spring', 'summer', 'autumn', 'winter'].forEach(s => {
+                const btn = document.getElementById(`recipe-tab-${s}`);
+                if (btn) {
+                    if (s === season) {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-bold transition-all bg-emerald-600 text-white shadow-xs";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+                    }
+                }
+            });
+            renderRecipes(season);
+        }
+
+        function renderRecipes(season) {
+            const grid = document.getElementById('recipes-grid');
+            if (!grid) return;
+
+            const filtered = recipesDatabase.filter(r => r.season === season);
+
+            grid.innerHTML = filtered.map(rec => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3 flex flex-col justify-between hover:border-emerald-300 transition-all">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-700">${rec.type}</span>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded font-bold">${rec.nature}・${rec.taste}味</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base">${rec.title}</h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">${rec.desc}</p>
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
+                        <div class="p-2 bg-slate-50 rounded-xl text-slate-700">
+                            <strong class="text-slate-900">使用食材：</strong>${rec.ingredients}
+                        </div>
+                        <div class="text-emerald-800 bg-emerald-50 p-2 rounded-xl">
+                            <strong class="text-emerald-900">調理のコツ：</strong>${rec.tip}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // --- JOURNAL & YAKUZEN TEAS FUNCTIONS ---
+        function saveJournalEntry(e) {
+            e.preventDefault();
+            const date = document.getElementById('journal-date').value;
+            const symptom = document.getElementById('journal-symptom').value;
+            const yinyang = document.getElementById('journal-yinyang').value;
+            const food = document.getElementById('journal-food').value;
+            const note = document.getElementById('journal-note').value;
+
+            const newLog = { id: Date.now(), date, symptom, yinyang, food, note };
+            let logs = JSON.parse(localStorage.getItem('yakuzen_logs') || '[]');
+            logs.unshift(newLog);
+            localStorage.setItem('yakuzen_logs', JSON.stringify(logs));
+
+            renderJournalLogs();
+            e.target.reset();
+            const dateInput = document.getElementById('journal-date');
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+        }
+
+        function renderJournalLogs() {
+            const list = document.getElementById('journal-history-list');
+            const countEl = document.getElementById('journal-count');
+            if (!list) return;
+
+            let logs = JSON.parse(localStorage.getItem('yakuzen_logs') || '[]');
+            if (countEl) countEl.textContent = `${logs.length}件の記録`;
+
+            if (logs.length === 0) {
+                list.innerHTML = `
+                    <div class="py-8 text-center text-slate-400 text-xs">
+                        まだコンディショニングの記録がありません。左側のフォームから今日の体調を記録してみましょう。
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = logs.map(log => `
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i> ${log.date}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">${log.symptom}</span>
+                            <span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-medium">${log.yinyang}</span>
+                            <button onclick="deleteJournalLog(${log.id})" class="text-slate-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-700"><strong>食材・お茶：</strong> ${log.food || 'なし'}</div>
+                    ${log.note ? `<div class="text-xs text-slate-500 italic">メモ：${log.note}</div>` : ''}
+                </div>
+            `).join('');
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function deleteJournalLog(id) {
+            let logs = JSON.parse(localStorage.getItem('yakuzen_logs') || '[]');
+            logs = logs.filter(l => l.id !== id);
+            localStorage.setItem('yakuzen_logs', JSON.stringify(logs));
+            renderJournalLogs();
+        }
+
+        function renderYakuzenTeas() {
+            const grid = document.getElementById('yakuzen-teas-grid');
+            if (!grid) return;
+
+            grid.innerHTML = yakuzenTeas.map(tea => `
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2 flex flex-col justify-between">
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">${tea.target}</span>
+                        <h4 class="font-bold text-slate-900 text-sm mt-1">${tea.title}</h4>
+                        <p class="text-xs text-slate-600 leading-snug">${tea.effect}</p>
+                    </div>
+                    <div class="text-[11px] text-slate-500 bg-white p-2 rounded-lg border border-slate-200">
+                        <strong>材料：</strong>${tea.ingredients}
+                    </div>
+                </div>
+            `).join('');
+            if (window.lucide) window.lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
